@@ -48,18 +48,18 @@ jobs:
       - name: ✅ Run tests
         run: flutter test --coverage
 
-      - name: 🏗️ Build APKs and IPA
+      - name: 🏗️ Build APKs and iOS
         run: |
           flutter build apk --split-per-abi
-          flutter build ipa --no-codesign
+          flutter build ios
 
       - name: 📦 Prepare artifacts
         run: |
           mkdir -p artifacts
           ls -la build/app/outputs/flutter-apk/
           cp build/app/outputs/flutter-apk/*.apk artifacts/
-          ls -la build/ios/ipa/
-          cp build/ios/ipa/*.ipa artifacts/
+          ls -la build/ios/archive/
+          cp build/ios/archive/*.xarchive artifacts/
 
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v4
@@ -74,5 +74,5 @@ jobs:
         with:
           tag:       ${{ github.ref_name }}
           name:      Release ${{ github.ref_name }}
-          artifacts: artifacts/*.apk, artifacts/*.ipa
+          artifacts: artifacts/*.apk, artifacts/*.xarchive
           token:     ${{ secrets.GITHUB_TOKEN }}
