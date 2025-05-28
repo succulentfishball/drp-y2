@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   build_and_release:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - name: 📂 Checkout code
@@ -48,16 +48,24 @@ jobs:
       - name: ✅ Run tests
         run: flutter test --coverage
 
-      - name: 🏗️ Build APKs
+      - name: 🏗️ Build APKs and IPA
         run: |
           flutter build apk --split-per-abi
-        # flutter build ipa --no-codesign
+          flutter build ipa --no-codesign
 
       - name: 📦 Prepare artifacts
         run: |
           mkdir -p artifacts
+          ls -la build/app/outputs/flutter-apk/
           cp build/app/outputs/flutter-apk/*.apk artifacts/
-        # cp build/ios/ipa/*.ipa artifacts/
+          ls -la build/ios/ipa/
+          cp build/ios/ipa/*.ipa artifacts/
+
+      - name: 📦 Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: my-artifacts
+          path: artifacts
 
       # ─────────────── ONLY ON TAGS ───────────────
       - name: 🏷️ Create or update Release
@@ -66,5 +74,5 @@ jobs:
         with:
           tag:       ${{ github.ref_name }}
           name:      Release ${{ github.ref_name }}
-          artifacts: artifacts/*.apk
+          artifacts: artifacts/*.apk, artifacts/*.ipa
           token:     ${{ secrets.GITHUB_TOKEN }}
