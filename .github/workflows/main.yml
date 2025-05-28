@@ -51,7 +51,7 @@ jobs:
       - name: 🏗️ Build APKs and IPA
         run: |
           flutter build apk --split-per-abi
-          flutter build ipa
+          flutter build ipa --no-codesign
 
       - name: 📦 Prepare artifacts
         run: |
