@@ -3,6 +3,7 @@ import 'package:drp/timeline.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:drp/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -130,7 +131,12 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: const Icon(Icons.people),
             tooltip: 'Group Settings',
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => LoginModal(),
+              );
+            },
           ), 
         ],
       ),
