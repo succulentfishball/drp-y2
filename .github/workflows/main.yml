@@ -51,15 +51,15 @@ jobs:
       - name: 🏗️ Build APKs and iOS
         run: |
           flutter build apk --split-per-abi
-          flutter build ios
+          flutter build ipa --no-codesign
 
       - name: 📦 Prepare artifacts
         run: |
           mkdir -p artifacts
           ls -la build/app/outputs/flutter-apk/
           cp build/app/outputs/flutter-apk/*.apk artifacts/
-          ls -la build/ios/archive/
-          cp build/ios/archive/*.xarchive artifacts/
+        # ls -la build/ios/archive/
+        # cp build/ios/archive/*.xarchive artifacts/
 
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v4
@@ -74,5 +74,5 @@ jobs:
         with:
           tag:       ${{ github.ref_name }}
           name:      Release ${{ github.ref_name }}
-          artifacts: artifacts/*.apk, artifacts/*.xarchive
+          artifacts: artifacts/*.apk
           token:     ${{ secrets.GITHUB_TOKEN }}
