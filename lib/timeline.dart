@@ -42,15 +42,54 @@ class PhotoWidgetState extends State<PhotoWidget> {
             )
           ),
           Center(
-            child: SizedBox(
-              // 80% of screen width
-              // width: MediaQuery.of(context).size.width * 0.8,
-              // full width
-              width: double.infinity,
-              child: Image.network(
-                widget.imageUrl,
-                fit: BoxFit.fitWidth,
-              ),
+            child: Stack(
+              children: [
+                SizedBox(
+                  // 80% of screen width
+                  // width: MediaQuery.of(context).size.width * 0.8,
+                  // full width
+                  width: double.infinity,
+                  child: Image.network(
+                    widget.imageUrl,
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage('https://picsum.photos/200'),
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(color: Colors.white, width: 2.0),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: Text(
+                      // todo replies
+                      "0 Replies",
+                      style: TextStyle(
+                        fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                    ),
+                  ),
+                ),
+              ]
             ),
           ),
           if (widget.caption.isNotEmpty && widget.caption != '') (
