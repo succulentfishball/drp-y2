@@ -70,8 +70,9 @@ class PhotoWidgetState extends State<PhotoWidget> {
 }
 
 class TimelineWidget extends StatefulWidget {
-  const TimelineWidget({super.key, required this.photos});
+  const TimelineWidget({super.key, required this.photos, required this.photoKeys});
   final List<PhotoWidget> photos;
+  final List<GlobalKey<PhotoWidgetState>> photoKeys;
 
   @override
   State<TimelineWidget> createState() => TimelineWidgetState();
@@ -79,14 +80,12 @@ class TimelineWidget extends StatefulWidget {
 
 class TimelineWidgetState extends State<TimelineWidget> {
   late ScrollController _scrollController;
-  List<GlobalKey<PhotoWidgetState>> _photoKeys = [];
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-    _photoKeys = List.generate(widget.photos.length, (_) => GlobalKey());
   }
 
   void _scrollListener() {
@@ -110,7 +109,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
     if (mostTopPhoto != null) {
       // Do something with the most top visible PhotoWidget
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Most top PhotoWidget: ${mostTopPhoto.toString()}')),
+        SnackBar(content: Text('Most top PhotoWidget: ${mostTopPhoto.caption}')),
       );
     }
   }
@@ -127,7 +126,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: PhotoWidget(
-              key: _photoKeys[index],
+              key: widget.photoKeys[index],
               imageUrl: widget.photos[index].imageUrl,
               dateTime: widget.photos[index].dateTime,
               user: widget.photos[index].user,

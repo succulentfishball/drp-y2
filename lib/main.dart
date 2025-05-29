@@ -60,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
     // add more sample photos here
   ];
+  List<GlobalKey<PhotoWidgetState>> photoKeys = [GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey()];
   final DateTime currentPhotoDataTime = DateTime.now();
 
   void uploadPhoto(String imagePath) {
@@ -70,14 +71,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // add to timeline
     setState(() {
+      GlobalKey<PhotoWidgetState> key = GlobalKey();
       photos.add(
         PhotoWidget(
+          key: key,
           imageUrl: imageUrl,
           dateTime: DateTime.now(),
           user: 'user1',
           caption: 'A beautiful day',
         )
       );
+      photoKeys.add(key);
     });
   }
 
@@ -131,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: Center(
-        child: TimelineWidget(photos: photos),
+        child: TimelineWidget(photos: photos, photoKeys: photoKeys),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton.large(
