@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:drp/timeline.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,18 +36,31 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<PhotoWidget> photos = [
     PhotoWidget(
       imageUrl: 'https://picsum.photos/200',
-      datetime: '2025-05-30 xx:xx',
+      dateTime: DateTime.now().subtract(const Duration(days: 1)),
+      user: 'User0',
+      caption: '',
+    ),
+    PhotoWidget(
+      imageUrl: 'https://picsum.photos/200',
+      dateTime: DateTime.now(),
       user: 'User1',
       caption: 'Hello\nWorld',
     ),
     PhotoWidget(
       imageUrl: 'https://picsum.photos/200',
-      datetime: '2025-05-30 xx:xx',
+      dateTime: DateTime.now(),
+      user: 'User1',
+      caption: 'Hello\nWorld again',
+    ),
+    PhotoWidget(
+      imageUrl: 'https://picsum.photos/200',
+      dateTime: DateTime.now().add(const Duration(days: 1)),
       user: 'User2',
       caption: '',
     ),
     // add more sample photos here
   ];
+  final DateTime currentPhotoDataTime = DateTime.now();
 
   void uploadPhoto(String imagePath) {
     // todo need to upload to database
@@ -59,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
       photos.add(
         PhotoWidget(
           imageUrl: imageUrl,
-          datetime: DateTime.now().toIso8601String(),
+          dateTime: DateTime.now(),
           user: 'user1',
           caption: 'A beautiful day',
         )
@@ -74,8 +88,19 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void openCalendar() {
+  Future<void> openCalendar() async {
     // todo open calendar functionality
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Picked ${DateFormat.yMMMMd().format(picked)}')),
+      );
+    }
   }
 
   Future<void> pickPhoto() async {
@@ -91,7 +116,19 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
-        title: Text('30 May 2025'),
+        title: Text(DateFormat.yMMMMd().format(DateTime.now())),
+        leading: IconButton(
+          icon: const Icon(Icons.filter_list),
+          tooltip: 'Filter Settings',
+          onPressed: () {},
+        ), 
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.people),
+            tooltip: 'Group Settings',
+            onPressed: () {},
+          ), 
+        ],
       ),
       body: Center(
         child: TimelineWidget(photos: photos),

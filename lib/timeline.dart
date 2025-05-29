@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class PhotoWidget extends StatelessWidget {
+class PhotoWidget extends StatefulWidget {
   final String imageUrl;
   final String caption;
-  final String datetime;
+  final DateTime dateTime;
   final String user;
 
-  const PhotoWidget({super.key, required this.imageUrl, required this.datetime, required this.user, this.caption = ''});
+  const PhotoWidget({super.key, required this.imageUrl, required this.dateTime, required this.user, this.caption = ''});
 
+  @override
+  PhotoWidgetState createState() => PhotoWidgetState();
+}
+
+class PhotoWidgetState extends State<PhotoWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,11 +31,11 @@ class PhotoWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  user,
+                  widget.user,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
                 ),
                 Text(
-                  datetime,
+                  "${DateFormat.yMMMMd().format(widget.dateTime)} ${DateFormat('jm').format(widget.dateTime)}",
                   style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
                 ),
               ],
@@ -42,17 +48,17 @@ class PhotoWidget extends StatelessWidget {
               // full width
               width: double.infinity,
               child: Image.network(
-                imageUrl,
+                widget.imageUrl,
                 fit: BoxFit.fitWidth,
               ),
             ),
           ),
-          if (caption.isNotEmpty && caption != '') (
+          if (widget.caption.isNotEmpty && widget.caption != '') (
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: 
               Text(
-                caption,
+                widget.caption,
                 style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
               ),
             )
@@ -72,19 +78,64 @@ class TimelineWidget extends StatefulWidget {
 }
 
 class TimelineWidgetState extends State<TimelineWidget> {
+  late ScrollController _scrollController;
+  List<GlobalKey<PhotoWidgetState>> _photoKeys = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
+    _photoKeys = List.generate(widget.photos.length, (_) => GlobalKey());
+  }
+
+  void _scrollListener() {
+    // Find the most top visible PhotoWidget
+    double mostTop = double.infinity;
+    PhotoWidget? mostTopPhoto;
+
+    for (var photo in widget.photos) {
+      final RenderObject? renderObject = (photo.key is GlobalKey && (photo.key as GlobalKey).currentContext != null)
+          ? (photo.key as GlobalKey).currentContext!.findRenderObject()
+          : null;
+      if (renderObject is RenderBox) {
+        final position = renderObject.localToGlobal(Offset.zero);
+        if (position.dy < mostTop) {
+          mostTop = position.dy;
+          mostTopPhoto = photo;
+        }
+      }
+    }
+
+    if (mostTopPhoto != null) {
+      // Do something with the most top visible PhotoWidget
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Most top PhotoWidget: ${mostTopPhoto.toString()}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: ListView.builder(
+        controller: _scrollController,
+        padding: EdgeInsets.only(bottom: 50.0),
         itemCount: widget.photos.length,
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: widget.photos[index]
+            child: PhotoWidget(
+              key: _photoKeys[index],
+              imageUrl: widget.photos[index].imageUrl,
+              dateTime: widget.photos[index].dateTime,
+              user: widget.photos[index].user,
+              caption: widget.photos[index].caption,
+            ),
           );
         },
-      ),
+      )
     );
   }
 }
