@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void uploadPhoto(String imagePath) {
     // todo need to upload to database
-    String imageUrl = 'https://picsum.photos/200';
+    // String imageUrl = 'https://picsum.photos/250';
 
     // todo need error handlers if not updated to database, then dont update local timeline
 
@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
       photos.add(
         PhotoWidget(
           key: key,
-          imageUrl: imageUrl,
+          imageUrl: imagePath,
           dateTime: DateTime.now(),
           user: 'user1',
           caption: 'A beautiful day',

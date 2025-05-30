@@ -1,5 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+bool isLocalImage(String path) {
+  return path.startsWith('/') || path.startsWith('file://');
+}
 
 class PhotoWidget extends StatefulWidget {
   final String imageUrl;
@@ -45,14 +50,13 @@ class PhotoWidgetState extends State<PhotoWidget> {
             child: Stack(
               children: [
                 SizedBox(
-                  // 80% of screen width
-                  // width: MediaQuery.of(context).size.width * 0.8,
-                  // full width
                   width: double.infinity,
-                  child: Image.network(
-                    widget.imageUrl,
-                    fit: BoxFit.fitWidth,
-                  ),
+                  child: (isLocalImage(widget.imageUrl)) ?
+                    Image.file(File(widget.imageUrl)) :
+                    Image.network(
+                      widget.imageUrl,
+                      fit: BoxFit.fitWidth,
+                    ),
                 ),
                 Positioned(
                   top: 8,
@@ -63,7 +67,7 @@ class PhotoWidgetState extends State<PhotoWidget> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                        image: NetworkImage('https://picsum.photos/200'),
+                        image: NetworkImage('https://picsum.photos/100'),
                         fit: BoxFit.cover,
                       ),
                       border: Border.all(color: Colors.white, width: 2.0),
@@ -147,9 +151,9 @@ class TimelineWidgetState extends State<TimelineWidget> {
 
     if (mostTopPhoto != null) {
       // Do something with the most top visible PhotoWidget
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Most top PhotoWidget: ${mostTopPhoto.caption}')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Most top PhotoWidget: ${mostTopPhoto.caption}')),
+      // );
     }
   }
 
