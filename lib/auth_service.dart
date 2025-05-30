@@ -12,7 +12,6 @@ class AuthService {
         password: password,
       );
       Toaster().displayAuthToast("Successfully registered");
-      await Future.delayed(const Duration(seconds: 1));
       return userCredential;
       
     } on FirebaseAuthException catch (e) {
@@ -20,7 +19,7 @@ class AuthService {
       if (e.code == 'weak-password') {
         msg = 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
-        msg = 'The account already exists for that email.';
+        msg = 'An account already exists for that email.';
       } else if (e.code == 'invalid-email') {
         msg = 'Email is invalid. Please check email entered.';
       } else {

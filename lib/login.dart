@@ -25,11 +25,13 @@ class LoginModalState extends State<LoginModal> {
 
   void _submitForm(BuildContext context) async {
     AuthService authService = AuthService();
+    UserCredential? credentials;
     if (_formKey.currentState!.validate()) {
       if (_isSignedIn) {
         // --- Case: Logging out ---
-        FirebaseAuth.instance.signOut();
         Toaster().displayAuthToast("Goodbye ${FirebaseAuth.instance.currentUser!.email}!");
+        await FirebaseAuth.instance.signOut(); 
+        if (context.mounted) Navigator.pushNamed(context, "/");
 
         setState(() {
           _isRegistering = false;
@@ -38,20 +40,20 @@ class LoginModalState extends State<LoginModal> {
       } else {
         if (_isRegistering) {
           // --- Case: Registering ---
-          UserCredential? credentials = await authService.register(
+          credentials = await authService.register(
             emailAddress: _email!, 
             password: _password!
           );
 
           if (credentials != null) {
             setState(() {
-              _isSignedIn = true;
+              _isSignedIn = false;
               _isRegistering = false;
             });
           }
         } else {
           // --- Case: Signing in ---
-          UserCredential? credentials = await authService.signin(
+          credentials = await authService.signin(
             emailAddress: _email!, 
             password: _password!
           );
@@ -66,14 +68,12 @@ class LoginModalState extends State<LoginModal> {
     }
 
     // Redirect user
-    if (context.mounted) {
+    if (credentials != null && context.mounted) {
       if (_isSignedIn) {
         Navigator.pushNamed(context, "/home");
       } else {
         Navigator.pushNamed(context, "/");
       }
-    } else {
-      Toaster().displayAuthToast("Unable to redirect user, please inform admin.");
     }
   }
 
