@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1039415992099",
+    "project_id": "drp-distributor",
+    "storage_bucket": "drp-distributor.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1039415992099:android:c29d3a126c64a574d83696",
+        "android_client_info": {
+          "package_name": "com.example.drp_37_2025"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDT-achNuZlJHtWubVmoVZfMOMiVDjrpKg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
