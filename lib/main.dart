@@ -24,11 +24,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      routes: {
-        // When navigating to the "/" route, build the FirstScreen widget.
-        '/': (context) => const LoginModal(),
-        '/home': (context) => const MyHomePage(),
-      },
+      // routes: {
+      //   // When navigating to the "/" route, build the FirstScreen widget.
+      //   '/': (context) => const LoginModal(),
+      //   '/home': (context) => const MyHomePage(),
+      // },
+      home: const MyHomePage(),
     );
   }
 }
@@ -154,8 +155,19 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context, snapshot) {
           if(!snapshot.hasData) return const Text("Loading...");
           final documents = snapshot.data!.docs;
-          return Text(documents[0]["msg"]);
-          //return TimelineWidget(photos: photos, photoKeys: photoKeys);
+          // String serializedDocuments = documents.map((doc) {
+          //   return doc.data().toString(); // Convert each document to a string
+          // }).join('\n');
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(child: TimelineWidget(photos: photos, photoKeys: photoKeys)),
+              // debug
+              // Text(serializedDocuments),
+            ]
+          );
+          return TimelineWidget(photos: photos, photoKeys: photoKeys);
         }
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
