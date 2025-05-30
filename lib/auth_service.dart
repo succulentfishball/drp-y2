@@ -1,7 +1,5 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:drp/toaster.dart' show Toaster;
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter/material.dart';
 
 class AuthService {
   Future<UserCredential?> register({
@@ -9,12 +7,16 @@ class AuthService {
     required String password
   }) async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential creds = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailAddress,
         password: password,
       );
+      Toaster().displayAuthToast("Successfully registered");
+      await Future.delayed(const Duration(seconds: 1));
+      return creds;
+      
     } on FirebaseAuthException catch (e) {
-      String msg = 'Success';
+      String msg = '';
       if (e.code == 'weak-password') {
         msg = 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
@@ -24,15 +26,7 @@ class AuthService {
       } else {
         msg = 'FirebaseAuthException caught when registering, please contact admin.';
       }
-
-      Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.SNACKBAR,
-        backgroundColor: Colors.black54,
-        textColor: Colors.white,
-        fontSize: 14.0
-      ); 
+      Toaster().displayAuthToast(msg);
       return null;
     } catch (e) {
       print(e); return null;

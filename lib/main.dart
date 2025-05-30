@@ -24,7 +24,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginModal(),
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/': (context) => const LoginModal(),
+        '/home': (context) => const MyHomePage(),
+      },
     );
   }
 }

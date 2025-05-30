@@ -1,4 +1,5 @@
 import 'package:drp/auth_service.dart';
+import 'package:drp/toaster.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -33,11 +34,12 @@ class LoginModalState extends State<LoginModal> {
     }
   }
 
-  void _submitForm() async {
+  void _submitForm(BuildContext context) async {
+    AuthService authService = AuthService();
     if (_formKey.currentState!.validate()) {
       if (!_isSignedIn) {
         if (_isRegistering) {
-          UserCredential? credentials = await AuthService().register(
+          UserCredential? credentials = await authService.register(
             emailAddress: _email!, 
             password: _password!
           );
@@ -74,6 +76,14 @@ class LoginModalState extends State<LoginModal> {
         }
       }
     }
+
+    // Redirect user
+    await Future.delayed(const Duration(seconds: 2));
+    if (_isSignedIn && context.mounted) {
+      Navigator.pushNamed(context, "/home");
+    } else {
+      Toaster().displayAuthToast("Unable to redirect user, please inform admin.");
+    }
   }
 
   @override
@@ -94,7 +104,7 @@ class LoginModalState extends State<LoginModal> {
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Email'),
                   onChanged: (value) => _email = value,
-                  validator: (value) => value!.isEmpty ? 'Enter a email' : null,
+                  validator: (value) => value!.isEmpty ? 'Enter an email' : null,
                 ),
               if (!_isSignedIn)
                 TextFormField(
@@ -111,7 +121,7 @@ class LoginModalState extends State<LoginModal> {
                 ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _submitForm,
+                onPressed: () => _submitForm(context),
                 child: Text(!_isSignedIn ? 
                   (_isRegistering ? 'Register' : 'Sign In') :
                   (_isInGroup ? 'Exit Group' : 'Join Group')
