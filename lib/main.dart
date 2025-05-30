@@ -4,8 +4,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:drp/login.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+
   runApp(const MyApp());
 }
 
@@ -140,8 +145,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ), 
         ],
       ),
-      body: Center(
-        child: TimelineWidget(photos: photos, photoKeys: photoKeys),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection("helloWorld").snapshots(),
+        builder: (context, snapshot) {
+          if(!snapshot.hasData) return const Text("Loading...");
+          final documents = snapshot.data!.docs;
+          return Text(documents[0]["msg"]);
+          //return TimelineWidget(photos: photos, photoKeys: photoKeys);
+        }
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton.large(
