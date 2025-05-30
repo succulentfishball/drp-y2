@@ -6,7 +6,7 @@ class Toaster {
     Fluttertoast.showToast(
       msg: msg,
       toastLength: Toast.LENGTH_LONG,
-      timeInSecForIosWeb: 3,
+      timeInSecForIosWeb: 2,
       gravity: ToastGravity.CENTER,
       backgroundColor: Colors.black87,
       textColor: Colors.white,

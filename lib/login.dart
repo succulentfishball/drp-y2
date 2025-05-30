@@ -12,32 +12,30 @@ class LoginModal extends StatefulWidget {
 
 class LoginModalState extends State<LoginModal> {
   final _formKey = GlobalKey<FormState>();
-  String? _email, _password, _groupCode;
+  String? _email, _password;
   bool _isRegistering = false;
-  bool _isSignedIn = false;
-  bool _isInGroup = false;
+  bool _isSignedIn = FirebaseAuth.instance.currentUser != null;
 
   void _toggleForm() {
-    if (_isSignedIn) {
-      // todo sign out
-
-      setState(() {
-        _isRegistering = false;
-        _isSignedIn = false;
-        _isInGroup = false;
-      });
-    } else {
-      // nothing to do here for backend
-      setState(() {
-        _isRegistering = !_isRegistering;
-      });
-    }
-  }
+    // nothing to do here for backend
+    setState(() {
+      _isRegistering = !_isRegistering;
+    });
+}
 
   void _submitForm(BuildContext context) async {
     AuthService authService = AuthService();
     if (_formKey.currentState!.validate()) {
-      if (!_isSignedIn) {
+      if (_isSignedIn) {
+        // --- Case: Logging out ---
+        FirebaseAuth.instance.signOut();
+        Toaster().displayAuthToast("Goodbye ${FirebaseAuth.instance.currentUser!.email}!");
+
+        setState(() {
+          _isRegistering = false;
+          _isSignedIn = false;
+        });
+      } else {
         if (_isRegistering) {
           // --- Case: Registering ---
           UserCredential? credentials = await authService.register(
@@ -64,34 +62,18 @@ class LoginModalState extends State<LoginModal> {
             });
           }
         }
-      } else {
-        // --- Case: Already signed in --- 
-        if (_isInGroup) {
-          // todo exit group
-
-          setState(() {
-            _isInGroup = false;
-            _groupCode = null;
-          });
-        } else {
-          // todo join group
-          print('Group Code: $_groupCode');
-
-          setState(() {
-            _isInGroup = true;
-          });
-        }
       }
     }
 
     // Redirect user
-    await Future.delayed(const Duration(seconds: 2));
-    if (_isSignedIn) {
-      if (context.mounted) {
+    if (context.mounted) {
+      if (_isSignedIn) {
         Navigator.pushNamed(context, "/home");
       } else {
-        Toaster().displayAuthToast("Unable to redirect user, please inform admin.");
+        Navigator.pushNamed(context, "/");
       }
+    } else {
+      Toaster().displayAuthToast("Unable to redirect user, please inform admin.");
     }
   }
 
@@ -99,7 +81,7 @@ class LoginModalState extends State<LoginModal> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(!_isSignedIn ? 
-        (_isRegistering ? 'Register' : 'Sign In') : 'Group Settings'
+        (_isRegistering ? 'Register' : 'Sign In') : 'Sign Out'
       ),
       content: SingleChildScrollView(
         child: Form(
@@ -107,8 +89,6 @@ class LoginModalState extends State<LoginModal> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (_isSignedIn && _isInGroup)
-                Text('You are in group "$_groupCode"'),
               if (!_isSignedIn)
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Email'),
@@ -122,26 +102,18 @@ class LoginModalState extends State<LoginModal> {
                   onChanged: (value) => _password = value,
                   validator: (value) => value!.isEmpty ? 'Enter a password' : null,
                 ),
-              if (_isSignedIn && !_isInGroup)
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Group Code'),
-                  onChanged: (value) => _groupCode = value,
-                  validator: (value) => value!.isEmpty ? 'Enter a group code' : null,
-                ),
+
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () => _submitForm(context),
-                child: Text(!_isSignedIn ? 
-                  (_isRegistering ? 'Register' : 'Sign In') :
-                  (_isInGroup ? 'Exit Group' : 'Join Group')
-                ),
+                child: Text(!_isSignedIn ? (_isRegistering ? 'Register' : 'Sign In') : "Sign Out"),
               ),
-              TextButton(
-                onPressed: _toggleForm,
-                child: Text(!_isSignedIn ?
-                  (_isRegistering ? 'Already have an account? Sign In' : 'Create an account') : 'Sign Out'
+
+              if (!_isSignedIn)
+                TextButton(
+                  onPressed: _toggleForm,
+                  child: Text((_isRegistering ? 'Already have an account? Sign In' : 'Create an account')),
                 ),
-              ),
             ],
           ),
         ),

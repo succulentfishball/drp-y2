@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/timeline.dart';
 import 'package:image_picker/image_picker.dart';
@@ -139,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.people),
-            tooltip: 'Group Settings',
+            tooltip: 'Account Settings',
             onPressed: () {
               showDialog(
                 context: context,
