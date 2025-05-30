@@ -7,13 +7,13 @@ class AuthService {
     required String password
   }) async {
     try {
-      UserCredential creds = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailAddress,
         password: password,
       );
       Toaster().displayAuthToast("Successfully registered");
       await Future.delayed(const Duration(seconds: 1));
-      return creds;
+      return userCredential;
       
     } on FirebaseAuthException catch (e) {
       String msg = '';
@@ -31,5 +31,37 @@ class AuthService {
     } catch (e) {
       print(e); return null;
     }
+  }
+
+  Future<UserCredential?> signin({
+    required String emailAddress,
+    required String password
+  }) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailAddress,
+        password: password
+      );
+      Toaster().displayAuthToast("Successfully signed in");
+      return userCredential;
+
+    } on FirebaseAuthException catch (e) {
+      String msg = '';
+      print(e.toString());
+      if (e.code == 'user-not-found') {
+        msg = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        msg = 'Wrong password provided for that user.';
+      }  else if (e.code == 'invalid-email') {
+        msg = 'Email is invalid. Please check email entered.';
+      } else if (e.code == "invalid-credential") {
+        msg = 'Email or password are incorrect or expired. Please check again';
+      }else {
+        msg = 'FirebaseAuthException caught when trying to sign in, please contact admin.';
+      }
+
+      Toaster().displayAuthToast(msg);
+    }
+    return null;
   }
 }

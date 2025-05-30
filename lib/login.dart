@@ -39,6 +39,7 @@ class LoginModalState extends State<LoginModal> {
     if (_formKey.currentState!.validate()) {
       if (!_isSignedIn) {
         if (_isRegistering) {
+          // --- Case: Registering ---
           UserCredential? credentials = await authService.register(
             emailAddress: _email!, 
             password: _password!
@@ -51,14 +52,20 @@ class LoginModalState extends State<LoginModal> {
             });
           }
         } else {
-          // todo sign in
-          print('Email: $_email, Password: $_password');
+          // --- Case: Signing in ---
+          UserCredential? credentials = await authService.signin(
+            emailAddress: _email!, 
+            password: _password!
+          );
 
-          setState(() {
-            _isSignedIn = true;
-          });
+          if (credentials != null) {
+            setState(() {
+              _isSignedIn = true;
+            });
+          }
         }
       } else {
+        // --- Case: Already signed in --- 
         if (_isInGroup) {
           // todo exit group
 
@@ -79,10 +86,12 @@ class LoginModalState extends State<LoginModal> {
 
     // Redirect user
     await Future.delayed(const Duration(seconds: 2));
-    if (_isSignedIn && context.mounted) {
-      Navigator.pushNamed(context, "/home");
-    } else {
-      Toaster().displayAuthToast("Unable to redirect user, please inform admin.");
+    if (_isSignedIn) {
+      if (context.mounted) {
+        Navigator.pushNamed(context, "/home");
+      } else {
+        Toaster().displayAuthToast("Unable to redirect user, please inform admin.");
+      }
     }
   }
 
