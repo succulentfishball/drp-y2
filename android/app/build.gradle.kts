@@ -42,8 +42,8 @@ android {
         applicationId = "com.example.drp"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk 23
-        targetSdk 23
+        minSdk = 33
+        targetSdk = 33
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
