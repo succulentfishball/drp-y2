@@ -1,3 +1,5 @@
+import 'package:drp/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginModal extends StatefulWidget {
@@ -9,7 +11,7 @@ class LoginModal extends StatefulWidget {
 
 class LoginModalState extends State<LoginModal> {
   final _formKey = GlobalKey<FormState>();
-  String? _username, _password, _groupCode;
+  String? _email, _password, _groupCode;
   bool _isRegistering = false;
   bool _isSignedIn = false;
   bool _isInGroup = false;
@@ -31,20 +33,24 @@ class LoginModalState extends State<LoginModal> {
     }
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       if (!_isSignedIn) {
         if (_isRegistering) {
-          // todo registration
-          print('Username: $_username, Password: $_password');
+          UserCredential? credentials = await AuthService().register(
+            emailAddress: _email!, 
+            password: _password!
+          );
 
-          setState(() {
-            _isSignedIn = true;
-            _isRegistering = false;
-          });
+          if (credentials != null) {
+            setState(() {
+              _isSignedIn = true;
+              _isRegistering = false;
+            });
+          }
         } else {
           // todo sign in
-          print('Username: $_username, Password: $_password');
+          print('Email: $_email, Password: $_password');
 
           setState(() {
             _isSignedIn = true;
@@ -86,9 +92,9 @@ class LoginModalState extends State<LoginModal> {
                 Text('You are in group "$_groupCode"'),
               if (!_isSignedIn)
                 TextFormField(
-                  decoration: const InputDecoration(labelText: 'Username'),
-                  onChanged: (value) => _username = value,
-                  validator: (value) => value!.isEmpty ? 'Enter a username' : null,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  onChanged: (value) => _email = value,
+                  validator: (value) => value!.isEmpty ? 'Enter a email' : null,
                 ),
               if (!_isSignedIn)
                 TextFormField(
