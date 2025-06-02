@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:drp/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,12 +25,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      // routes: {
-      //   // When navigating to the "/" route, build the FirstScreen widget.
-      //   '/': (context) => const LoginModal(),
-      //   '/home': (context) => const MyHomePage(),
-      // },
-      home: const MyHomePage(),
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/': (context) => (FirebaseAuth.instance.currentUser == null) ? const LoginModal() : const MyHomePage(),
+        '/home': (context) => const MyHomePage(),
+      },
+      // home: const MyHomePage(),
     );
   }
 }
