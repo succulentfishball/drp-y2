@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:drp/photo_modal.dart';
 
 bool isLocalImage(String path) {
   return path.startsWith('/') || path.startsWith('file://');
@@ -88,7 +89,7 @@ class PhotoWidgetState extends State<PhotoWidget> {
                         children: [
                           Text(
                             widget.user,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
                           ),
                           Text(
                             "${DateFormat.yMMMMd().format(widget.dateTime)} ${DateFormat('jm').format(widget.dateTime)}",
@@ -100,16 +101,24 @@ class PhotoWidgetState extends State<PhotoWidget> {
                     Center(
                       child: Stack(
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(16.0),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: (isLocalImage(widget.imageUrl)) ?
-                                Image.file(File(widget.imageUrl)) :
-                                Image.network(
-                                  widget.imageUrl,
-                                  fit: BoxFit.fitWidth,
-                                ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => PhotoModal(imageUrl: widget.imageUrl, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16.0),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: (isLocalImage(widget.imageUrl)) ?
+                                  Image.file(File(widget.imageUrl)) :
+                                  Image.network(
+                                    widget.imageUrl,
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                              ),
                             ),
                           ),
                           Positioned(
@@ -123,9 +132,9 @@ class PhotoWidgetState extends State<PhotoWidget> {
                               ),
                               child: Text(
                                 // todo replies
-                                "0 Replies",
+                                "2 Replies",
                                 style: TextStyle(
-                                  fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
+                                  fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
                                   color: Theme.of(context).colorScheme.onSecondaryContainer,
                                 ),
                               ),
