@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:drp/timeline.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:drp/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:drp/utils.dart' as utils;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,26 +46,26 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final ImagePicker picker = ImagePicker();
   // todo need better user, time formats to align with database
-  final List<PhotoWidget> photos = [
-    PhotoWidget(
+  final List<TimelineNodeWidget> photos = [
+    TimelineNodeWidget(
       imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now().subtract(const Duration(days: 1)),
       user: 'Mom',
       caption: '',
     ),
-    PhotoWidget(
+    TimelineNodeWidget(
       imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now(),
       user: 'Dad',
       caption: 'Hello\nWorld',
     ),
-    PhotoWidget(
+    TimelineNodeWidget(
       imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now(),
       user: 'Dad',
       caption: 'Hello\nWorld again',
     ),
-    PhotoWidget(
+    TimelineNodeWidget(
       imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now().add(const Duration(days: 1)),
       user: 'Brother',
@@ -73,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
     // add more sample photos here
   ];
-  List<GlobalKey<PhotoWidgetState>> photoKeys = [GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey()];
+  List<GlobalKey<TimelineNodeWidgetState>> photoKeys = [GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey()];
   final DateTime currentPhotoDataTime = DateTime.now();
 
   void uploadPhoto(String imagePath) {
@@ -84,9 +84,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // add to timeline
     setState(() {
-      GlobalKey<PhotoWidgetState> key = GlobalKey();
+      GlobalKey<TimelineNodeWidgetState> key = GlobalKey();
       photos.add(
-        PhotoWidget(
+        TimelineNodeWidget(
           key: key,
           imageUrl: imagePath,
           dateTime: DateTime.now(),
@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     if (picked != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Picked ${DateFormat.yMMMMd().format(picked)}')),
+        SnackBar(content: Text('Picked ${utils.date(picked)}')),
       );
     }
   }
@@ -133,12 +133,12 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
-        title: Text(DateFormat.yMMMMd().format(DateTime.now())),
+        title: Text(utils.date(DateTime.now())),
         leading: IconButton(
           icon: const Icon(Icons.filter_list),
           tooltip: 'Filter Settings',
           onPressed: () {},
-        ), 
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.people),
@@ -149,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 builder: (context) => LoginModal(),
               );
             },
-          ), 
+          ),
         ],
       ),
       body: StreamBuilder(
@@ -169,7 +169,6 @@ class _MyHomePageState extends State<MyHomePage> {
               // Text(serializedDocuments),
             ]
           );
-          return TimelineWidget(photos: photos, photoKeys: photoKeys);
         }
       ),
       floatingActionButton: SpeedDial(

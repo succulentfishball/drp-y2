@@ -1,37 +1,9 @@
-import 'dart:io';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-
-bool isLocalImage(String path) {
-  return path.startsWith('/') || path.startsWith('file://');
-}
-
-class CommentWidget extends StatefulWidget  {
-  const CommentWidget({super.key, required this.caption, required this.dateTime, required this.user});
-  final String caption;
-  final DateTime dateTime;
-  final String user;
-
-  @override
-  State<CommentWidget> createState() => CommentWidgetState();
-}
-
-class CommentWidgetState extends State<CommentWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage('https://picsum.photos/100'),
-      ),
-      title: Text(widget.user),
-      subtitle: Text(widget.caption),
-      trailing: Text("${DateFormat.yMMMMd().format(widget.dateTime)}\n${DateFormat('jm').format(widget.dateTime)}"),
-    );
-  }
-}
+import 'package:drp/comment_widget.dart';
+import 'package:drp/utils.dart' as utils;
 
 class PhotoModal extends StatefulWidget {
-  PhotoModal({super.key, required this.imageUrl, required this.caption, required this.dateTime, required this.user});
+  const PhotoModal({super.key, required this.imageUrl, required this.caption, required this.dateTime, required this.user});
   final String imageUrl;
   final String caption;
   final DateTime dateTime;
@@ -90,12 +62,7 @@ class PhotoModalState extends State<PhotoModal> {
               borderRadius: BorderRadius.circular(24.0),
               child: SizedBox(
                 width: double.infinity,
-                child: (isLocalImage(widget.imageUrl)) ?
-                  Image.file(File(widget.imageUrl)) :
-                  Image.network(
-                    widget.imageUrl,
-                    fit: BoxFit.fitWidth,
-                  ),
+                child: utils.getImage(widget.imageUrl)
               ),
             ),
             // scrollable comment section

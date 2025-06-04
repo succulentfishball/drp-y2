@@ -1,25 +1,19 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:drp/photo_modal.dart';
+import 'package:drp/post_widget.dart';
 
-bool isLocalImage(String path) {
-  return path.startsWith('/') || path.startsWith('file://');
-}
-
-class PhotoWidget extends StatefulWidget {
+class TimelineNodeWidget extends StatefulWidget {
   final String imageUrl;
   final String caption;
   final DateTime dateTime;
   final String user;
 
-  const PhotoWidget({super.key, required this.imageUrl, required this.dateTime, required this.user, this.caption = ''});
+  const TimelineNodeWidget({super.key, required this.imageUrl, required this.dateTime, required this.user, this.caption = ''});
 
   @override
-  PhotoWidgetState createState() => PhotoWidgetState();
+  TimelineNodeWidgetState createState() => TimelineNodeWidgetState();
 }
 
-class PhotoWidgetState extends State<PhotoWidget> {
+class TimelineNodeWidgetState extends State<TimelineNodeWidget> {
   @override
   Widget build(BuildContext context) {
     return 
@@ -72,91 +66,8 @@ class PhotoWidgetState extends State<PhotoWidget> {
                 Spacer(),
               ],
             ),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            widget.user,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
-                          ),
-                          Text(
-                            "${DateFormat.yMMMMd().format(widget.dateTime)} ${DateFormat('jm').format(widget.dateTime)}",
-                            style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
-                          ),
-                        ],
-                      )
-                    ),
-                    Center(
-                      child: Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => PhotoModal(imageUrl: widget.imageUrl, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
-                              );
-                            },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16.0),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: (isLocalImage(widget.imageUrl)) ?
-                                  Image.file(File(widget.imageUrl)) :
-                                  Image.network(
-                                    widget.imageUrl,
-                                    fit: BoxFit.fitWidth,
-                                  ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 8,
-                            right: 8,
-                            child: Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
-                                borderRadius: BorderRadius.circular(16.0),
-                              ),
-                              child: Text(
-                                // todo replies
-                                "2 Replies",
-                                style: TextStyle(
-                                  fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-                                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ]
-                      ),
-                    ),
-                    if (widget.caption.isNotEmpty && widget.caption != '') (
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: 
-                        Text(
-                          widget.caption,
-                          style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
-                        ),
-                      )
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // actual timeline post
+            PostWidget(imageUrl: widget.imageUrl, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
           ]
       ),
     );
@@ -165,8 +76,8 @@ class PhotoWidgetState extends State<PhotoWidget> {
 
 class TimelineWidget extends StatefulWidget {
   const TimelineWidget({super.key, required this.photos, required this.photoKeys});
-  final List<PhotoWidget> photos;
-  final List<GlobalKey<PhotoWidgetState>> photoKeys;
+  final List<TimelineNodeWidget> photos;
+  final List<GlobalKey<TimelineNodeWidgetState>> photoKeys;
 
   @override
   State<TimelineWidget> createState() => TimelineWidgetState();
@@ -183,9 +94,9 @@ class TimelineWidgetState extends State<TimelineWidget> {
   }
 
   void _scrollListener() {
-    // Find the most top visible PhotoWidget
+    // Find the most top visible TimelineWidget
     double mostTop = double.infinity;
-    PhotoWidget? mostTopPhoto;
+    TimelineNodeWidget? mostTopPhoto;
 
     for (var photo in widget.photos) {
       final RenderObject? renderObject = (photo.key is GlobalKey && (photo.key as GlobalKey).currentContext != null)
@@ -201,9 +112,9 @@ class TimelineWidgetState extends State<TimelineWidget> {
     }
 
     if (mostTopPhoto != null) {
-      // Do something with the most top visible PhotoWidget
+      // Do something with the most top visible TimelineWidget
       // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Most top PhotoWidget: ${mostTopPhoto.caption}')),
+      //   SnackBar(content: Text('Most top TimelineWidget: ${mostTopPhoto.caption}')),
       // );
     }
   }
@@ -216,7 +127,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
         // controller: _scrollController,
         itemCount: widget.photos.length,
         itemBuilder: (context, index) {
-          return PhotoWidget(
+          return TimelineNodeWidget(
               key: widget.photoKeys[index],
               imageUrl: widget.photos[index].imageUrl,
               dateTime: widget.photos[index].dateTime,
