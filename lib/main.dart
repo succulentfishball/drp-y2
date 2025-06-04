@@ -1,3 +1,4 @@
+import 'package:drp/user.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/timeline.dart';
 import 'package:image_picker/image_picker.dart';
@@ -75,6 +76,32 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
   List<GlobalKey<PhotoWidgetState>> photoKeys = [GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey()];
   final DateTime currentPhotoDataTime = DateTime.now();
+
+  // Firebase shenanigans
+  final dbRef = FirebaseFirestore.instance;
+
+  // Fetch user data 
+  final userID = FirebaseAuth.instance.currentUser!.uid;
+  MyUser? user;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData().then((fetchedUser) {
+      setState(() {
+        user = fetchedUser;
+      });
+    });
+  }
+
+  Future<MyUser> fetchUserData() async {
+    final fetchedData = await dbRef.collection("Users").doc(userID).withConverter(
+      fromFirestore: MyUser.fromFirestore,
+      toFirestore: (MyUser user, _) => user.toFirestore()
+    ).get();
+
+    return fetchedData.data()!;
+  }
 
   void uploadPhoto(String imagePath) {
     // todo need to upload to database
