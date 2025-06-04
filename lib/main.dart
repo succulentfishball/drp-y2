@@ -141,6 +141,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.notifications),
+            tooltip: 'Notifications',
+            onPressed: () {},
+          ),
+          IconButton(
             icon: const Icon(Icons.people),
             tooltip: 'Account Settings',
             onPressed: () {
