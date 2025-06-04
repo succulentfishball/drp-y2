@@ -21,92 +21,134 @@ class PhotoWidget extends StatefulWidget {
 class PhotoWidgetState extends State<PhotoWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.8,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return 
+    IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  widget.user,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                // timeline vertical line
+                Expanded(
+                  child: Container(
+                    height: 10,
+                    width: 6,
+                    color: Theme.of(context).colorScheme.surfaceTint,
+                  ),
                 ),
-                Text(
-                  "${DateFormat.yMMMMd().format(widget.dateTime)} ${DateFormat('jm').format(widget.dateTime)}",
-                  style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
+                // profile picture
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage('https://picsum.photos/100'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                // timeline vertical line
+                Expanded(
+                  child: Container(
+                    width: 6,
+                    color: Theme.of(context).colorScheme.surfaceTint,
+                  ),
                 ),
               ],
-            )
-          ),
-          Center(
-            child: Stack(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: (isLocalImage(widget.imageUrl)) ?
-                    Image.file(File(widget.imageUrl)) :
-                    Image.network(
-                      widget.imageUrl,
-                      fit: BoxFit.fitWidth,
-                    ),
-                ),
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: NetworkImage('https://picsum.photos/100'),
-                        fit: BoxFit.cover,
-                      ),
-                      border: Border.all(color: Colors.white, width: 2.0),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 8,
-                  right: 8,
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                    child: Text(
-                      // todo replies
-                      "0 Replies",
-                      style: TextStyle(
-                        fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
-                        color: Theme.of(context).colorScheme.onSecondaryContainer,
-                      ),
-                    ),
-                  ),
-                ),
-              ]
             ),
-          ),
-          if (widget.caption.isNotEmpty && widget.caption != '') (
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: 
-              Text(
-                widget.caption,
-                style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
+            // timeline horizontal line
+            Column(
+              children: [
+                Spacer(),
+                Container(
+                  width: 64,
+                  height: 4,
+                  color: Theme.of(context).colorScheme.surfaceTint,
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                ),
+                Spacer(),
+              ],
+            ),
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            widget.user,
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                          ),
+                          Text(
+                            "${DateFormat.yMMMMd().format(widget.dateTime)} ${DateFormat('jm').format(widget.dateTime)}",
+                            style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
+                          ),
+                        ],
+                      )
+                    ),
+                    Center(
+                      child: Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16.0),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: (isLocalImage(widget.imageUrl)) ?
+                                Image.file(File(widget.imageUrl)) :
+                                Image.network(
+                                  widget.imageUrl,
+                                  fit: BoxFit.fitWidth,
+                                ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 8,
+                            right: 8,
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
+                                borderRadius: BorderRadius.circular(16.0),
+                              ),
+                              child: Text(
+                                // todo replies
+                                "0 Replies",
+                                style: TextStyle(
+                                  fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
+                                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]
+                      ),
+                    ),
+                    if (widget.caption.isNotEmpty && widget.caption != '') (
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: 
+                        Text(
+                          widget.caption,
+                          style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
+                        ),
+                      )
+                    ),
+                  ],
+                ),
               ),
-            )
-          ),
-        ],
+            ),
+          ]
       ),
     );
   }
@@ -166,16 +208,13 @@ class TimelineWidgetState extends State<TimelineWidget> {
         padding: EdgeInsets.only(bottom: 50.0),
         itemCount: widget.photos.length,
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: PhotoWidget(
+          return PhotoWidget(
               key: widget.photoKeys[index],
               imageUrl: widget.photos[index].imageUrl,
               dateTime: widget.photos[index].dateTime,
               user: widget.photos[index].user,
               caption: widget.photos[index].caption,
-            ),
-          );
+            );
         },
       )
     );

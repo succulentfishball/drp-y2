@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'DRP',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
       ),
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
@@ -49,25 +49,25 @@ class _MyHomePageState extends State<MyHomePage> {
     PhotoWidget(
       imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now().subtract(const Duration(days: 1)),
-      user: 'User0',
+      user: 'Mom',
       caption: '',
     ),
     PhotoWidget(
       imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now(),
-      user: 'User1',
+      user: 'Dad',
       caption: 'Hello\nWorld',
     ),
     PhotoWidget(
       imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now(),
-      user: 'User1',
+      user: 'Dad',
       caption: 'Hello\nWorld again',
     ),
     PhotoWidget(
       imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now().add(const Duration(days: 1)),
-      user: 'User2',
+      user: 'Brother',
       caption: '',
     ),
     // add more sample photos here
@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
           key: key,
           imageUrl: imagePath,
           dateTime: DateTime.now(),
-          user: 'user1',
+          user: 'Dad',
           caption: 'A beautiful day',
         )
       );
@@ -188,13 +188,13 @@ class _MyHomePageState extends State<MyHomePage> {
             IconButton(
               onPressed: () {openCalendar();},
               tooltip: 'Open calendar',
-              icon: Icon(Icons.calendar_month_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 30.0)
+              icon: Icon(Icons.calendar_month_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 36.0)
             ),
             Spacer(), Spacer(), Spacer(), Spacer(),
             IconButton(
               onPressed: () {pickPhoto();},
               tooltip: 'Pick Photo',
-              icon: Icon(Icons.photo_album_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 30.0)
+              icon: Icon(Icons.photo_library_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 36.0)
             ),
             Spacer(),
           ],
