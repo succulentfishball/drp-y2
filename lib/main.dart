@@ -7,6 +7,7 @@ import 'package:drp/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -171,35 +172,30 @@ class _MyHomePageState extends State<MyHomePage> {
           return TimelineWidget(photos: photos, photoKeys: photoKeys);
         }
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton.large(
-        onPressed: () {takePhoto();},
-        tooltip: 'Take a picture',
-        shape: CircleBorder(),
-        child: const Icon(Icons.camera_alt),
+      floatingActionButton: SpeedDial(
+        marginEnd: MediaQuery.sizeOf(context).width - 32 - 4,
+        marginBottom: 8,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        icon: Icons.add,
+        activeIcon: Icons.remove,
+        overlayOpacity: 0.0,
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.photo_library_outlined),
+            onTap: () {
+              pickPhoto();
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.camera_alt),
+            onTap: () {
+              takePhoto();
+            },
+          ),
+        ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).colorScheme.primary,
-        shape: const CircularNotchedRectangle(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Spacer(),
-            IconButton(
-              onPressed: () {openCalendar();},
-              tooltip: 'Open calendar',
-              icon: Icon(Icons.calendar_month_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 36.0)
-            ),
-            Spacer(), Spacer(), Spacer(), Spacer(),
-            IconButton(
-              onPressed: () {pickPhoto();},
-              tooltip: 'Pick Photo',
-              icon: Icon(Icons.photo_library_outlined, color: Theme.of(context).colorScheme.onPrimary, size: 36.0)
-            ),
-            Spacer(),
-          ],
-        )
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat
     );
   }
 }

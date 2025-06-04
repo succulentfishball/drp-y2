@@ -204,8 +204,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: ListView.builder(
-        controller: _scrollController,
-        padding: EdgeInsets.only(bottom: 50.0),
+        // controller: _scrollController,
         itemCount: widget.photos.length,
         itemBuilder: (context, index) {
           return PhotoWidget(
