@@ -71,6 +71,8 @@ class PhotoWidgetState extends State<PhotoWidget> {
 
   @override
   Widget build(BuildContext context) {
+    String? caption = widget.post.caption;
+
     return 
     IntrinsicHeight(
       child: Row(
@@ -184,16 +186,16 @@ class PhotoWidgetState extends State<PhotoWidget> {
                         ]
                       ),
                     ),
-                    // if (caption.isNotEmpty && caption != '') (
-                    //   Padding(
-                    //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    //     child: 
-                    //     Text(
-                    //       "caption",
-                    //       style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
-                    //     ),
-                    //   )
-                    // ),
+                    if (caption != null && caption != '') (
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: 
+                        Text(
+                          caption,
+                          style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
+                        ),
+                      )
+                    ),
                   ],
                 ),
               ),
