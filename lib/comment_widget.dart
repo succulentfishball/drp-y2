@@ -15,8 +15,18 @@ class CommentWidgetState extends State<CommentWidget> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage('https://picsum.photos/100'),
+      leading: Container(
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Theme.of(context).colorScheme.surfaceContainer
+        ),
+        child: Icon(
+          Icons.person,
+          size: 32,
+          color: Theme.of(context).colorScheme.onSurfaceVariant
+        ),
       ),
       title: Text(widget.user),
       subtitle: Text(widget.caption),

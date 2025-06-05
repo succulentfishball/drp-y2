@@ -38,10 +38,12 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> {
                   height: 64,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: NetworkImage('https://picsum.photos/100'),
-                      fit: BoxFit.cover,
-                    ),
+                    color: Theme.of(context).colorScheme.surfaceContainer
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    size: 32,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant
                   ),
                 ),
                 // timeline vertical line

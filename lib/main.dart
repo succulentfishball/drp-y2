@@ -48,25 +48,25 @@ class _MyHomePageState extends State<MyHomePage> {
   // todo need better user, time formats to align with database
   final List<TimelineNodeWidget> photos = [
     TimelineNodeWidget(
-      imageUrl: 'assets/lib/dummy_data/pictures/mumpost1.jpeg',
+      imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now().subtract(const Duration(days: 1)),
       user: 'Mom',
       caption: '',
     ),
     TimelineNodeWidget(
-      imageUrl: 'assets/lib/dummy_data/pictures/dadpost1.jpg',
+      imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now(),
       user: 'Dad',
       caption: 'Sunset',
     ),
     TimelineNodeWidget(
-      imageUrl: 'assets/lib/dummy_data/pictures/dadpost2.jpg',
+      imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now(),
       user: 'Dad',
       caption: 'Park',
     ),
     TimelineNodeWidget(
-      imageUrl: 'assets/lib/dummy_data/pictures/bropost1.jpeg',
+      imageUrl: 'https://picsum.photos/200',
       dateTime: DateTime.now().add(const Duration(days: 1)),
       user: 'Brother',
       caption: 'look at what im eating without you',
