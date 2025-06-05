@@ -1,25 +1,74 @@
-import 'dart:io';
+import 'package:drp/backend_service.dart';
+import 'package:drp/post.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:drp/photo_modal.dart';
 
-bool isLocalImage(String path) {
-  return path.startsWith('/') || path.startsWith('file://');
+bool isLocalImage(String? path) {
+  return path != null && (path.startsWith('/') || path.startsWith('file://'));
 }
 
 class PhotoWidget extends StatefulWidget {
-  final String imageUrl;
-  final String caption;
-  final DateTime dateTime;
-  final String user;
-
-  const PhotoWidget({super.key, required this.imageUrl, required this.dateTime, required this.user, this.caption = ''});
+  final Post post;
+  const PhotoWidget({super.key, required this.post});
 
   @override
   PhotoWidgetState createState() => PhotoWidgetState();
 }
 
 class PhotoWidgetState extends State<PhotoWidget> {
+  Widget buildLabels(Post post) {
+    final p1 = "authorDisplayName";
+    final p2 = "creationTime";
+
+    // Create future function to communicate with backend
+    return FutureBuilder<Map<String, dynamic>>(
+      future: Future(() async {
+        final authorDisplayName = await BackEndService.fetchNameFromUUID(post.authorID!);
+        final img = await BackEndService.fetchImageDataFromDB(post.imageIDs![0]);
+        final time = img!.creationTime;
+        
+        return Future.value({
+          p1: authorDisplayName,
+          p2: time
+        });
+      }),
+      builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        String authorDisplayName = "";
+        DateTime creationTime = DateTime.now();
+        if (snapshot.connectionState == ConnectionState.waiting){
+          authorDisplayName = 'loading...';
+        } else {
+          if (snapshot.hasError) {
+            print('Error: ${snapshot.error}');
+          } else if (snapshot.hasData) {
+            authorDisplayName = snapshot.data![p1];
+            creationTime = snapshot.data![p2];
+          } else {
+            authorDisplayName = "No data :(";
+            creationTime = DateTime.now();
+          }
+        }
+
+        // Generate label widgets
+        
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              authorDisplayName,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
+            ),
+            Text(
+              "${DateFormat.yMMMMd().format(creationTime)} ${DateFormat('jm').format(creationTime)}",
+              style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
+            ),
+          ],
+        );
+      }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return 
@@ -84,19 +133,7 @@ class PhotoWidgetState extends State<PhotoWidget> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            widget.user,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
-                          ),
-                          Text(
-                            "${DateFormat.yMMMMd().format(widget.dateTime)} ${DateFormat('jm').format(widget.dateTime)}",
-                            style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
-                          ),
-                        ],
-                      )
+                      child: buildLabels(widget.post)
                     ),
                     Center(
                       child: Stack(
@@ -105,19 +142,23 @@ class PhotoWidgetState extends State<PhotoWidget> {
                             onTap: () {
                               showDialog(
                                 context: context,
-                                builder: (context) => PhotoModal(imageUrl: widget.imageUrl, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
+                                builder: (context) => Text("hi")//PhotoModal(
+                                //   data: imgData!, 
+                                //   caption: caption, 
+                                //   dateTime: creationTime, 
+                                //   user: authorName!
+                                // ),
                               );
                             },
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(16.0),
                               child: SizedBox(
                                 width: double.infinity,
-                                child: (isLocalImage(widget.imageUrl)) ?
-                                  Image.file(File(widget.imageUrl)) :
-                                  Image.network(
-                                    widget.imageUrl,
-                                    fit: BoxFit.fitWidth,
-                                  ),
+                                child: Text("Hello")
+                                // child:Image.memory(
+                                //   imgData!,
+                                //   fit: BoxFit.fitWidth,
+                                // ),
                               ),
                             ),
                           ),
@@ -143,16 +184,16 @@ class PhotoWidgetState extends State<PhotoWidget> {
                         ]
                       ),
                     ),
-                    if (widget.caption.isNotEmpty && widget.caption != '') (
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: 
-                        Text(
-                          widget.caption,
-                          style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
-                        ),
-                      )
-                    ),
+                    // if (caption.isNotEmpty && caption != '') (
+                    //   Padding(
+                    //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    //     child: 
+                    //     Text(
+                    //       "caption",
+                    //       style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
+                    //     ),
+                    //   )
+                    // ),
                   ],
                 ),
               ),
@@ -218,10 +259,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
         itemBuilder: (context, index) {
           return PhotoWidget(
               key: widget.photoKeys[index],
-              imageUrl: widget.photos[index].imageUrl,
-              dateTime: widget.photos[index].dateTime,
-              user: widget.photos[index].user,
-              caption: widget.photos[index].caption,
+              post: widget.photos[index].post
             );
         },
       )

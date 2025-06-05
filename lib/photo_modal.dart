@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
@@ -31,8 +31,8 @@ class CommentWidgetState extends State<CommentWidget> {
 }
 
 class PhotoModal extends StatefulWidget {
-  PhotoModal({super.key, required this.imageUrl, required this.caption, required this.dateTime, required this.user});
-  final String imageUrl;
+  const PhotoModal({super.key, required this.data, required this.caption, required this.dateTime, required this.user});
+  final Uint8List data;
   final String caption;
   final DateTime dateTime;
   final String user;
@@ -90,12 +90,10 @@ class PhotoModalState extends State<PhotoModal> {
               borderRadius: BorderRadius.circular(24.0),
               child: SizedBox(
                 width: double.infinity,
-                child: (isLocalImage(widget.imageUrl)) ?
-                  Image.file(File(widget.imageUrl)) :
-                  Image.network(
-                    widget.imageUrl,
-                    fit: BoxFit.fitWidth,
-                  ),
+                child: Image.memory(
+                  widget.data,
+                  fit: BoxFit.fitWidth,
+                ),
               ),
             ),
             // scrollable comment section

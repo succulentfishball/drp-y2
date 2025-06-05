@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:drp/auth_service.dart';
+import 'package:drp/backend_service.dart';
 import 'package:drp/toaster.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart';
@@ -15,15 +17,17 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:drp/user.dart';
+import 'package:drp/post.dart';
+import 'package:drp/image.dart';
 
 // Assume every user is in the same family/group for now
 const String dummyGroupID = "9366e9b0-415b-11f0-bf9f-b5479dd77560";
+BackEndService? backendService;
+MyUser? userData;
 
 void main() async {
-  FirebaseFirestore.setLoggingEnabled(true);
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
-
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -56,34 +60,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final ImagePicker picker = ImagePicker();
-  final List<PhotoWidget> photos = [
-    PhotoWidget(
-      imageUrl: 'https://picsum.photos/200',
-      dateTime: DateTime.now().subtract(const Duration(days: 1)),
-      user: 'Mom',
-      caption: '',
-    ),
-    PhotoWidget(
-      imageUrl: 'https://picsum.photos/200',
-      dateTime: DateTime.now(),
-      user: 'Dad',
-      caption: 'Hello\nWorld',
-    ),
-    PhotoWidget(
-      imageUrl: 'https://picsum.photos/200',
-      dateTime: DateTime.now(),
-      user: 'Dad',
-      caption: 'Hello\nWorld again',
-    ),
-    PhotoWidget(
-      imageUrl: 'https://picsum.photos/200',
-      dateTime: DateTime.now().add(const Duration(days: 1)),
-      user: 'Brother',
-      caption: '',
-    ),
-    // add more sample photos here
-  ];
-  List<GlobalKey<PhotoWidgetState>> photoKeys = [GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey()];
+  final List<PhotoWidget> photos = List.empty(growable: true);
+  final List<GlobalKey<PhotoWidgetState>> photoKeys = List.empty(growable: true);
   final DateTime currentPhotoDataTime = DateTime.now();
 
   // File data variables
@@ -93,71 +71,47 @@ class _MyHomePageState extends State<MyHomePage> {
   final storageRef = FirebaseStorage.instance.ref(); 
   final dbRef = FirebaseFirestore.instance;
 
-  // User data
-  final String userID = FirebaseAuth.instance.currentUser!.uid;
-  MyUser? userData;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchUserData();
-  }
-
-  Future<void> fetchUserData() async {
-    final fetchedData = await dbRef.collection("Users").doc(userID).withConverter(
-      fromFirestore: MyUser.fromFirestore,
-      toFirestore: (MyUser user, _) => user.toFirestore(),
-    ).get();
-
-    userData = fetchedData.data();
-    setState(() {});
-  }
-
   void uploadPhoto(XFile file) async {
     // String imageUrl = 'https://picsum.photos/250';
 
     // Get meta data and file data
     final exif = await Exif.fromPath(file.path);
     final bytes = await File(file.path).readAsBytes();
-    String imgId = Uuid().v1().toString();
-    final fileRef = storageRef.child("images/${userData!.groupID!}/$imgId.jpg");
-
-    // Upload image to Firebase Storage
-    try {
-      await fileRef.putData(bytes);
-
-      // Upload image data
-      await dbRef.collection("Images").doc(imgId).set({
-        "ownerID": userID,
-        "creationTime": exif.getOriginalDate()
-      });
-
-      // Upload post data
-      final postID = Uuid().v1();
-      await dbRef.collection("Group_Data").doc(userData!.groupID!).collection("Posts").doc(postID).set({
-        "authorID": userID,
-        "imageIDs": [imgId],
-        "caption": "captions to be implemented",
-      });
-
-      // add to timeline
-      final originTime = await exif.getOriginalDate();
-      setState(() {
-        GlobalKey<PhotoWidgetState> key = GlobalKey();
-        photos.add(
-          PhotoWidget(
-            key: key,
-            imageUrl: file.path,
-            dateTime: originTime!,
-            user: userData!.name!,
-            caption: "Captions yet to be implemented",
-          )
-        );
-        photoKeys.add(key);
-      });
+    String imgID = Uuid().v1().toString();
     
-    } on firebase_core.FirebaseException catch (e) {
-      Toaster().displayAuthToast("Failed to upload image");
+    try {
+      final fileRef = storageRef.child("images/${userData!.groupID!}/$imgID.jpg");
+
+      // Upload image to Firebase Storage
+      try {
+        await fileRef.putData(bytes);
+
+        // Upload image data
+        MyImage newImg = MyImage(ownerID: BackEndService.userID, creationTime: await exif.getOriginalDate());
+        await dbRef.collection("Group_Data").doc(userData!.groupID!).collection("Images").doc(imgID).set(
+          newImg.toFirestore()
+        );
+
+        // Upload post data
+        final postID = Uuid().v1();
+        Post newPost = Post(authorID: BackEndService.userID, imageIDs: [imgID], caption: "captions to be implemented", postTime: DateTime.now());
+        await dbRef.collection("Group_Data").doc(userData!.groupID!).collection("Posts").doc(postID).set(
+          newPost.toFirestore()
+        );
+
+        // add to timeline
+        setState(() {
+          GlobalKey<PhotoWidgetState> key = GlobalKey();
+          photos.add(PhotoWidget(post: newPost));
+        });
+
+      } on firebase_core.FirebaseException catch (e) {
+        print(e);
+        Toaster().displayAuthToast("Failed to upload image");
+      }
+    } catch (e) {
+      print(e);
+      Toaster().displayAuthToast("Error uploading post, please try again later.");
     }
   }
 
@@ -192,6 +146,43 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (userData == null || BackEndService.groupID == null || BackEndService.userID == null) {
+      return FutureBuilder(
+        future: initialiseGlobalVars(),
+        builder: (context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting){
+            return Text('loading... please wait...');
+          } else {
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (snapshot.hasData && snapshot.data!) {
+              return getMainInterface();
+            } else if (snapshot.hasData && snapshot.data! == false) {
+              return Text("Failed to intialise global variables...");
+            } else {
+              return Text("Unexpected event when initialising global variables.");
+            }
+          }
+        }
+      );
+    } else {
+      return getMainInterface();
+    }
+  }
+
+  Future<bool> initialiseGlobalVars() async {
+    print("initialise global vars");
+    await BackEndService().initialise(); 
+    final fetchedData = await dbRef.collection("Users").doc(BackEndService.userID).withConverter(
+      fromFirestore: MyUser.fromFirestore,
+      toFirestore: (MyUser user, _) => user.toFirestore(),
+    ).get();
+    userData = fetchedData.data();
+    print("groupID: ${BackEndService.groupID}, userID: $BackEndService.userID, userData: $userData");
+    return Future.value(userData != null && BackEndService.groupID != null && BackEndService.userID != null);
+  }
+
+  Widget getMainInterface() {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -216,20 +207,28 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: StreamBuilder(
-        stream: dbRef.collection("helloWorld").snapshots(),
+        stream: FirebaseFirestore.instance.collection("Group_Data")
+                    .doc(BackEndService.getGroupID())
+                    .collection("Posts").snapshots(),
         builder: (context, snapshot) {
           if(!snapshot.hasData) return const Text("Loading...");
-          final documents = snapshot.data!.docs;
-          // String serializedDocuments = documents.map((doc) {
-          //   return doc.data().toString(); // Convert each document to a string
-          // }).join('\n');
+
+          // Clear and load in all posts
+          photos.clear();
+          for (final snap in snapshot.data!.docs) {
+            Post loadedPost = Post.fromFirestore(snap, null);
+            GlobalKey<PhotoWidgetState> key = GlobalKey<PhotoWidgetState>();
+            photos.add(PhotoWidget(key: key, post: loadedPost));
+            photoKeys.add(key);
+            print("photo added"); 
+          }
+          photos.sort((a, b) => (a.post.postTime!.compareTo(b.post.postTime!)));
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(child: TimelineWidget(photos: photos, photoKeys: photoKeys)),
-              // debug
-              // Text(serializedDocuments),
             ]
           );
         }
