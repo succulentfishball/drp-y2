@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:drp/auth_service.dart';
 import 'package:drp/backend_service.dart';
 import 'package:drp/toaster.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_core;
@@ -206,17 +205,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ), 
         ],
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("Group_Data")
-                    .doc(BackEndService.getGroupID())
-                    .collection("Posts").snapshots(),
+      body: FutureBuilder<List<Post>>(
+        future: BackEndService.fetchAllPostsFromGroup(),
         builder: (context, snapshot) {
           if(!snapshot.hasData) return const Text("Loading...");
-
           // Clear and load in all posts
           photos.clear();
-          for (final snap in snapshot.data!.docs) {
-            Post loadedPost = Post.fromFirestore(snap, null);
+          for (final loadedPost in snapshot.data!) {
             GlobalKey<PhotoWidgetState> key = GlobalKey<PhotoWidgetState>();
             photos.add(PhotoWidget(key: key, post: loadedPost));
             photoKeys.add(key);

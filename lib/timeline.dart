@@ -1,6 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:drp/backend_service.dart';
 import 'package:drp/post.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -16,23 +17,36 @@ class PhotoWidget extends StatefulWidget {
   PhotoWidgetState createState() => PhotoWidgetState();
 }
 
-class PhotoWidgetState extends State<PhotoWidget> {
-  Widget buildLabels(Post post) {
-    final p1 = "authorDisplayName";
-    final p2 = "creationTime";
+class PhotoWidgetState extends State<PhotoWidget> with AutomaticKeepAliveClientMixin {
+  final p1 = "authorDisplayName";
+  final p2 = "creationTime";
+  Future<Uint8List?>? imgData;
+  Future<Map<String, dynamic>>? labelData;
 
+  @override
+  void initState() {
+    String? firstImgID = widget.post.imageIDs![0];
+
+    // Future data
+    imgData = BackEndService.fetchImageFromCloudByID(firstImgID!);
+    labelData = Future(() async {
+      final authorDisplayName = await BackEndService.fetchNameFromUUID(widget.post.authorID!);
+      final img = await BackEndService.fetchImageDataFromDB(widget.post.imageIDs![0]);
+      final time = img!.creationTime;
+      
+      return Future.value({
+        p1: authorDisplayName,
+        p2: time
+      });
+    });
+
+    super.initState();
+  }
+
+  Widget buildLabels(Post post) {
     // Create future function to communicate with backend
     return FutureBuilder<Map<String, dynamic>>(
-      future: Future(() async {
-        final authorDisplayName = await BackEndService.fetchNameFromUUID(post.authorID!);
-        final img = await BackEndService.fetchImageDataFromDB(post.imageIDs![0]);
-        final time = img!.creationTime;
-        
-        return Future.value({
-          p1: authorDisplayName,
-          p2: time
-        });
-      }),
+      future: labelData,
       builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         String authorDisplayName = "";
         DateTime creationTime = DateTime.now();
@@ -51,7 +65,6 @@ class PhotoWidgetState extends State<PhotoWidget> {
         }
 
         // Generate label widgets
-        
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -65,6 +78,25 @@ class PhotoWidgetState extends State<PhotoWidget> {
             ),
           ],
         );
+      }
+    );
+  }
+
+  Widget buildImage() {
+    return FutureBuilder(
+      future: imgData, 
+      builder: (context, snapshot) {
+        print("Future interaction");
+        if (snapshot.hasError) {
+          return Text("Error encountered");
+        } else if (snapshot.hasData) {
+          return Image.memory(
+            snapshot.data!,
+            fit: BoxFit.fitWidth,
+          );
+        } else {
+          return Text("Loading image...");
+        }
       }
     );
   }
@@ -156,11 +188,7 @@ class PhotoWidgetState extends State<PhotoWidget> {
                               borderRadius: BorderRadius.circular(16.0),
                               child: SizedBox(
                                 width: double.infinity,
-                                child: Text("Hello")
-                                // child:Image.memory(
-                                //   imgData!,
-                                //   fit: BoxFit.fitWidth,
-                                // ),
+                                child: buildImage()
                               ),
                             ),
                           ),
@@ -204,6 +232,9 @@ class PhotoWidgetState extends State<PhotoWidget> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class TimelineWidget extends StatefulWidget {
@@ -217,12 +248,24 @@ class TimelineWidget extends StatefulWidget {
 
 class TimelineWidgetState extends State<TimelineWidget> {
   late ScrollController _scrollController;
+  Widget? kids;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
+
+    kids = ListView.builder(
+      // controller: _scrollController,
+      itemCount: widget.photos.length,
+      itemBuilder: (context, index) {
+        return PhotoWidget(
+            key: widget.photoKeys[index],
+            post: widget.photos[index].post
+          );
+      },
+    );
   }
 
   void _scrollListener() {
@@ -255,16 +298,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ListView.builder(
-        // controller: _scrollController,
-        itemCount: widget.photos.length,
-        itemBuilder: (context, index) {
-          return PhotoWidget(
-              key: widget.photoKeys[index],
-              post: widget.photos[index].post
-            );
-        },
-      )
+      child: kids
     );
   }
 }
