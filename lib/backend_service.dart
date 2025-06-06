@@ -8,6 +8,7 @@ import 'package:drp/post.dart';
 import 'package:drp/toaster.dart' show Toaster;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:uuid/uuid.dart';
 
 const maxUsernameLength = 5;
 
@@ -22,14 +23,9 @@ class BackEndService {
   // Static factory
   Future<void> initialise() async {
     // Do initialization that requires async
-    if (groupID == null || userID == null) { await _asyncInit(); }
-
-    // Check if user needs a username / groupID
-    try {
-      final res = await dbRef.collection("Users").doc(userID).get();
-      res["groupID"]; res["name"];
-    } catch(e) {
-      BackEndService.setUserData(FirebaseAuth.instance.currentUser!.uid);
+    if (groupID == null || userID == null) { 
+      await _asyncInit(); 
+      if (groupID == null) { await setUserData(userID!); }
     }
 
     // Return the fully initialized object
@@ -37,12 +33,12 @@ class BackEndService {
   }
 
   Future<void> _asyncInit() async {
-    userID = FirebaseAuth.instance.currentUser!.uid;
     try {
+      userID = FirebaseAuth.instance.currentUser!.uid;
       final snapshot = await dbRef.collection("Users").doc(userID).get();
       groupID = snapshot["groupID"];
     } catch (e) {
-      print(e);
+      print("caught $e");
     }
   }
 
@@ -80,10 +76,13 @@ class BackEndService {
   static String? getGroupID() { return groupID; }
 
   static Future<void> setUserData(String uid) async {
+    final randomGroupID = Uuid().v1();
     await dbRef.collection("Users").doc(uid).set({
-      "groupID": dummyGroupID,
+      "groupID": testMode ? dummyGroupID : randomGroupID,
       "name": FirebaseAuth.instance.currentUser!.email!.substring(0,maxUsernameLength)
     });
+    groupID = randomGroupID;
+    print("groupID set to $randomGroupID");
   }
 
   static clearUserData() {

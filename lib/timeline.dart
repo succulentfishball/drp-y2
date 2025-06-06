@@ -256,16 +256,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
 
-    kids = ListView.builder(
-      // controller: _scrollController,
-      itemCount: widget.photos.length,
-      itemBuilder: (context, index) {
-        return PhotoWidget(
-            key: widget.photoKeys[index],
-            post: widget.photos[index].post
-          );
-      },
-    );
+    print("initialising timeline state");
   }
 
   void _scrollListener() {
@@ -298,7 +289,16 @@ class TimelineWidgetState extends State<TimelineWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: kids
+      child: ListView.builder(
+        // controller: _scrollController,
+        itemCount: widget.photos.length,
+        itemBuilder: (context, index) {
+          return PhotoWidget(
+              key: widget.photoKeys[index],
+              post: widget.photos[index].post
+            );
+        },
+      )
     );
   }
 }

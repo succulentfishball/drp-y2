@@ -19,7 +19,7 @@ import 'package:drp/user.dart';
 import 'package:drp/post.dart';
 import 'package:drp/image.dart';
 
-// Assume every user is in the same family/group for now
+const bool testMode = false;
 const String dummyGroupID = "9366e9b0-415b-11f0-bf9f-b5479dd77560";
 BackEndService? backendService;
 MyUser? userData;
@@ -98,11 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
           newPost.toFirestore()
         );
 
-        // add to timeline
-        setState(() {
-          GlobalKey<PhotoWidgetState> key = GlobalKey();
-          photos.add(PhotoWidget(post: newPost));
-        });
+        setState(() {});
 
       } on firebase_core.FirebaseException catch (e) {
         print(e);
@@ -146,6 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     if (userData == null || BackEndService.groupID == null || BackEndService.userID == null) {
+      print("initialisation build");
       return FutureBuilder(
         future: initialiseGlobalVars(),
         builder: (context, AsyncSnapshot<bool> snapshot) {
@@ -165,6 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       );
     } else {
+      print("normal build");
       return getMainInterface();
     }
   }
@@ -177,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
       toFirestore: (MyUser user, _) => user.toFirestore(),
     ).get();
     userData = fetchedData.data();
-    print("groupID: ${BackEndService.groupID}, userID: $BackEndService.userID, userData: $userData");
+    print("groupID: ${BackEndService.groupID}, userID: ${BackEndService.userID}, userData: $userData");
     return Future.value(userData != null && BackEndService.groupID != null && BackEndService.userID != null);
   }
 
