@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:drp/backend_service.dart';
+import 'package:drp/photo_modal.dart';
 import 'package:drp/post.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -176,12 +177,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
                             onTap: () {
                               showDialog(
                                 context: context,
-                                builder: (context) => Text("hi")//PhotoModal(
-                                //   data: imgData!, 
-                                //   caption: caption, 
-                                //   dateTime: creationTime, 
-                                //   user: authorName!
-                                // ),
+                                builder: (context) => PhotoModal(post: widget.post),
                               );
                             },
                             child: ClipRRect(

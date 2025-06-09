@@ -63,10 +63,11 @@ class BackEndService {
   static Future<Uint8List?> fetchImageFromCloudByID(String imgID) async {
     final islandRef = storageRef.child("images/$groupID/$imgID.jpg");
     try {
-      print("Trying to download from cloud...");
+      print("Trying to download $imgID from cloud...");
       const oneMegabyte = 1024 * 1024;
       return await islandRef.getData(oneMegabyte);
     } on FirebaseException catch (e) {
+      print("Error encountered when downloading image from cloud");
       Toaster().displayAuthToast("Failed to retrieve image from cloud... Error: $e");
       return null;
     }

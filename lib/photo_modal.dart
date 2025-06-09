@@ -1,14 +1,13 @@
 
-import 'package:flutter/services.dart';
+import 'package:drp/backend_service.dart';
+import 'package:drp/main.dart';
+import 'package:drp/post.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/comment_widget.dart';
 
 class PhotoModal extends StatefulWidget {
-  const PhotoModal({super.key, required this.data, required this.caption, required this.dateTime, required this.user});
-  final Uint8List data;
-  final String caption;
-  final DateTime dateTime;
-  final String user;
+  const PhotoModal({super.key, required this.post});
+  final Post post;
 
   @override
   PhotoModalState createState() => PhotoModalState();
@@ -21,9 +20,15 @@ class PhotoModalState extends State<PhotoModal> {
   @override
   void initState() {
     super.initState();
-    comments = [
-      if (widget.caption.isNotEmpty)
-        CommentWidget(caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
+  }
+
+  Future<CommentWidget> _buildPostComment() async {
+    final String? username = await BackEndService.fetchNameFromUUID(widget.post.authorID!);
+    return CommentWidget(caption: widget.post.caption!, dateTime: widget.post.postTime!, user: username!);
+  }
+
+  List<CommentWidget> _dummyComments() {
+    return [
       CommentWidget(caption: "where is this?", dateTime: DateTime.now(), user: "me"),
       CommentWidget(caption: "we went xxx today, it was qwertyuiopasdfghjklzxcvbnm", dateTime: DateTime.now(), user: "Dad"),
     ];
@@ -63,23 +68,44 @@ class PhotoModalState extends State<PhotoModal> {
               borderRadius: BorderRadius.circular(24.0),
               child: SizedBox(
                 width: double.infinity,
-                child: Image.memory(
-                  widget.data,
-                  fit: BoxFit.fitWidth,
-                ),
+                child: FutureBuilder(
+                  future: BackEndService.fetchImageFromCloudByID(widget.post.imageIDs![0]), 
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Text("Loading image...");
+                    } else {
+                      return Image.memory(snapshot.data!, fit: BoxFit.fitWidth);
+                    }
+                  }
+                )
               ),
             ),
             // scrollable comment section
             Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    return comments[index];
-                  },
-                ),
+                // This will require stream builder
+                child: FutureBuilder(
+                  future: _buildPostComment(), 
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) { return Text("Loading comments..."); }
+
+                    comments.add(snapshot.data!);
+                    
+                    // Dummy comments
+                    if (testMode) { 
+                      comments.addAll(_dummyComments()); 
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        return comments[index];
+                      },
+                    );
+                  }
+                )
               ),
             ),
             // add comment input
