@@ -1,9 +1,7 @@
 
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/comment_widget.dart';
-import 'package:drp/utils.dart' as utils;
 
 class PhotoModal extends StatefulWidget {
   const PhotoModal({super.key, required this.data, required this.caption, required this.dateTime, required this.user});

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:drp/backend_service.dart';
 import 'package:drp/toaster.dart';
+import 'package:drp/utils.dart' as utils;
 import 'package:firebase_auth/firebase_auth.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,8 @@ import 'package:drp/user.dart';
 import 'package:drp/post.dart';
 import 'package:drp/image.dart';
 
-const bool testMode = false;
+const bool testMode = true;
 const String dummyGroupID = "9366e9b0-415b-11f0-bf9f-b5479dd77560";
-BackEndService? backendService;
 MyUser? userData;
 
 void main() async {
@@ -58,8 +58,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final ImagePicker picker = ImagePicker();
-  final List<PhotoWidget> photos = List.empty(growable: true);
-  final List<GlobalKey<PhotoWidgetState>> photoKeys = List.empty(growable: true);
+  final List<TimelineNodeWidget> photos = List.empty(growable: true);
+  final List<GlobalKey<TimelineNodeWidgetState>> photoKeys = List.empty(growable: true);
   final DateTime currentPhotoDataTime = DateTime.now();
 
   // File data variables
@@ -139,6 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("Building home page.");
+    // Check if important data needs to be initialised/fetched before proceeding to generate UI via getMainInterface()
     if (userData == null || BackEndService.groupID == null || BackEndService.userID == null) {
       print("initialisation build");
       return FutureBuilder(
@@ -206,27 +208,30 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: FutureBuilder<List<Post>>(
-        future: BackEndService.fetchAllPostsFromGroup(),
+      body: StreamBuilder(
+        stream: BackEndService.getAllPostSnapshotsFromGroup(), 
         builder: (context, snapshot) {
-          if(!snapshot.hasData) return const Text("Loading...");
-          // Clear and load in all posts
-          photos.clear();
-          for (final loadedPost in snapshot.data!) {
-            GlobalKey<PhotoWidgetState> key = GlobalKey<PhotoWidgetState>();
-            photos.add(PhotoWidget(key: key, post: loadedPost));
-            photoKeys.add(key);
-            print("photo added"); 
-          }
-          photos.sort((a, b) => (a.post.postTime!.compareTo(b.post.postTime!)));
+          print("At stream builder");
+          if (snapshot.hasData) {
+            photos.clear();
+            for (final doc in snapshot.data!.docs) {
+              GlobalKey<TimelineNodeWidgetState> key = GlobalKey<TimelineNodeWidgetState>();
+              photos.add(TimelineNodeWidget(key: key, post: Post.fromFirestore(doc, null)));
+              photoKeys.add(key);
+            }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(child: TimelineWidget(photos: photos, photoKeys: photoKeys)),
-            ]
-          );
+            photos.sort((a, b) => (a.post.postTime!.compareTo(b.post.postTime!)));
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(child: TimelineWidget(photos: photos, photoKeys: photoKeys)),
+              ]
+            );
+          } else {
+            return Text("No data for home page");
+          }
         }
       ),
       floatingActionButton: SpeedDial(

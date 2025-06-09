@@ -1,19 +1,29 @@
+import 'dart:typed_data';
+
+import 'package:drp/backend_service.dart';
+import 'package:drp/post.dart';
 import 'package:flutter/material.dart';
-import 'package:drp/photo_modal.dart';
 import 'package:drp/utils.dart' as utils;
 
 class PostWidget extends StatefulWidget {
-  const PostWidget({super.key, required this.imageUrl, required this.caption, required this.dateTime, required this.user});
-  final String imageUrl;
-  final String caption;
-  final DateTime dateTime;
-  final String user;
+  const PostWidget({super.key, required this.post});
+  final Post post;
 
   @override
   PostWidgetState createState() => PostWidgetState();
 }
 
 class PostWidgetState extends State<PostWidget> {
+  Future<Uint8List?>? imgData;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.post.imageIDs != null && widget.post.imageIDs!.isNotEmpty) {
+      imgData = BackEndService.fetchImageFromCloudByID(widget.post.imageIDs![0]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -33,11 +43,11 @@ class PostWidgetState extends State<PostWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.user,
+                    BackEndService.userID!,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
                   ),
                   Text(
-                    "${utils.date(widget.dateTime)} ${utils.time(widget.dateTime)}",
+                    "${utils.date(widget.post.postTime!)} ${utils.time(widget.post.postTime!)}",
                     style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
                   ),
                 ],
@@ -48,17 +58,28 @@ class PostWidgetState extends State<PostWidget> {
               child: Stack(
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => PhotoModal(imageUrl: widget.imageUrl, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
-                      );
-                    },
+                    // onTap: () {
+                    //   showDialog(
+                    //     context: context,
+                    //     builder: (context) => PhotoModal(imageUrl: widget.imageUrl, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
+                    //   );
+                    // },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16.0),
                       child: SizedBox(
                         width: double.infinity,
-                        child: utils.getImage(widget.imageUrl),
+                        child: FutureBuilder<Uint8List?>(
+                          future: imgData,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+                              return const Center(child: Icon(Icons.broken_image));
+                            } else {
+                              return Image.memory(snapshot.data!);
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -86,12 +107,12 @@ class PostWidgetState extends State<PostWidget> {
               ),
             ),
             // caption at the bottom
-            if (widget.caption.isNotEmpty && widget.caption != '') (
+            if (widget.post.caption!.isNotEmpty && widget.post.caption! != '') (
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: 
                 Text(
-                  widget.caption,
+                  widget.post.caption!,
                   style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
                 ),
               )

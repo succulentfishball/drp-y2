@@ -1,5 +1,3 @@
-import 'dart:ffi';
-import 'dart:math';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp/image.dart';
@@ -8,6 +6,7 @@ import 'package:drp/post.dart';
 import 'package:drp/toaster.dart' show Toaster;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 const maxUsernameLength = 5;
@@ -54,6 +53,11 @@ class BackEndService {
       posts.add(Post.fromFirestore(doc, null));
     }
     return posts;
+  } 
+
+  // Care should be taken with snapshots to avoid StreamBuilders from breaking
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllPostSnapshotsFromGroup() {
+    return dbRef.collection("Group_Data").doc(groupID!).collection("Posts").snapshots();
   } 
 
   static Future<Uint8List?> fetchImageFromCloudByID(String imgID) async {

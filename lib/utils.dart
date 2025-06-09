@@ -7,6 +7,8 @@ bool isLocalImage(String path) {
 }
 
 Image getImage(String path) {
+  if (path.startsWith('assets/')) { print("returning asset image"); return Image.asset(path); } 
+
   return isLocalImage(path) ?
     Image.file(
       File(path),

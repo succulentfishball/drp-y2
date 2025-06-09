@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:drp/backend_service.dart';
 import 'package:drp/post.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,7 @@ bool isLocalImage(String? path) {
 
 class TimelineNodeWidget extends StatefulWidget {
   final Post post;
-  const PhotoWidget({super.key, required this.post});
+  const TimelineNodeWidget({super.key, required this.post});
 
   @override
   TimelineNodeWidgetState createState() => TimelineNodeWidgetState();
@@ -86,7 +85,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
     return FutureBuilder(
       future: imgData, 
       builder: (context, snapshot) {
-        print("Future interaction");
+        print("Future interaction building image in timeline.dart");
         if (snapshot.hasError) {
           return Text("Error encountered");
         } else if (snapshot.hasData) {
@@ -256,8 +255,6 @@ class TimelineWidgetState extends State<TimelineWidget> {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-
-    print("initialising timeline state");
   }
 
   void _scrollListener() {
