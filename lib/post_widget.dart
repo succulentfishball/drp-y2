@@ -1,10 +1,11 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/photo_modal.dart';
 import 'package:drp/utils.dart' as utils;
 
 class PostWidget extends StatefulWidget {
-  const PostWidget({super.key, required this.imageUrl, required this.caption, required this.dateTime, required this.user});
-  final String imageUrl;
+  const PostWidget({super.key, required this.data, required this.caption, required this.dateTime, required this.user});
+  final Uint8List data;
   final String caption;
   final DateTime dateTime;
   final String user;
@@ -51,14 +52,15 @@ class PostWidgetState extends State<PostWidget> {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => PhotoModal(imageUrl: widget.imageUrl, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
+                        //   const PhotoModal({super.key, required this.data, required this.caption, required this.dateTime, required this.user});
+                        builder: (context) => PhotoModal(data: widget.data, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
                       );
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16.0),
                       child: SizedBox(
                         width: double.infinity,
-                        child: utils.getImage(widget.imageUrl),
+                        child: utils.getImageFromBytes(widget.data),
                       ),
                     ),
                   ),

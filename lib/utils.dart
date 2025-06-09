@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
 
@@ -16,6 +17,14 @@ Image getImage(String path) {
       path,
       fit: BoxFit.fitWidth,
     );
+}
+
+
+Image getImageFromBytes(Uint8List bytes) {
+  return Image.memory(
+    bytes,
+    fit: BoxFit.fitWidth,
+  );
 }
 
 String date(DateTime dateTime) {

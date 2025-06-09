@@ -11,7 +11,7 @@ bool isLocalImage(String? path) {
 
 class TimelineNodeWidget extends StatefulWidget {
   final Post post;
-  const PhotoWidget({super.key, required this.post});
+  const TimelineNodeWidget({super.key, required this.post});
 
   @override
   TimelineNodeWidgetState createState() => TimelineNodeWidgetState();

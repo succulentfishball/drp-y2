@@ -17,6 +17,11 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:drp/user.dart';
 import 'package:drp/post.dart';
 import 'package:drp/image.dart';
+import 'package:drp/family_members.dart';
+import 'package:badges/badges.dart' as badges;
+import 'package:drp/utils.dart' as utils;
+
+
 
 const bool testMode = false;
 const String dummyGroupID = "9366e9b0-415b-11f0-bf9f-b5479dd77560";
@@ -43,6 +48,7 @@ class MyApp extends StatelessWidget {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => (FirebaseAuth.instance.currentUser == null) ? const LoginModal() : const MyHomePage(),
         '/home': (context) => const MyHomePage(),
+        '/members': (context) => FamilyMembersPage(),
       },
       // home: const MyHomePage(),
     );
@@ -58,8 +64,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final ImagePicker picker = ImagePicker();
-  final List<PhotoWidget> photos = List.empty(growable: true);
-  final List<GlobalKey<PhotoWidgetState>> photoKeys = List.empty(growable: true);
+  final List<TimelineNodeWidget> photos = List.empty(growable: true);
+  final List<GlobalKey<TimelineNodeWidgetState>> photoKeys = List.empty(growable: true);
   final DateTime currentPhotoDataTime = DateTime.now();
 
   // File data variables
@@ -189,19 +195,37 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {},
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            tooltip: 'Notifications',
-            onPressed: () {},
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('pokes')
+                .where('toUser', isEqualTo: FirebaseAuth.instance.currentUser?.displayName ?? FirebaseAuth.instance.currentUser?.email)
+                .orderBy('timestamp', descending: true)
+                .snapshots(),
+            builder: (context, snapshot) {
+              final hasNewPokes = snapshot.hasData && snapshot.data!.docs.isNotEmpty;
+
+              return IconButton(
+                icon: badges.Badge(
+                  showBadge: hasNewPokes,
+                  badgeStyle: const badges.BadgeStyle(badgeColor: Colors.red),
+                  position: badges.BadgePosition.topEnd(top: -2, end: -2),
+                  child: const Icon(Icons.notifications),
+                ),
+                tooltip: 'Notifications',
+                onPressed: () {
+                  // TODO: Replace with actual poke inbox page
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Tapped notifications")),
+                  );
+                },
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.people),
-            tooltip: 'Account Settings',
+            tooltip: 'Family Members',
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => LoginModal(),
-              );
+              Navigator.pushNamed(context, '/members');
             },
           ),
         ],
@@ -213,8 +237,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // Clear and load in all posts
           photos.clear();
           for (final loadedPost in snapshot.data!) {
-            GlobalKey<PhotoWidgetState> key = GlobalKey<PhotoWidgetState>();
-            photos.add(PhotoWidget(key: key, post: loadedPost));
+            GlobalKey<TimelineNodeWidgetState> key = GlobalKey<TimelineNodeWidgetState>();
+            photos.add(TimelineNodeWidget(key: key, post: loadedPost));
             photoKeys.add(key);
             print("photo added"); 
           }
