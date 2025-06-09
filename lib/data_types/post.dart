@@ -5,8 +5,9 @@ class Post {
   List? imageIDs;
   DateTime? postTime;
   String? caption;
+  String? tag;
 
-  Post({this.authorID, this.imageIDs, this.postTime, this.caption});
+  Post({this.authorID, this.imageIDs, this.postTime, this.caption, this.tag});
 
   factory Post.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -18,6 +19,7 @@ class Post {
       imageIDs: data?['imageIDs'],
       postTime: DateTime.fromMillisecondsSinceEpoch(data?['postTime']),
       caption: data?['caption'],
+      tag: data?['tag'],
     );
   }
 
@@ -26,7 +28,8 @@ class Post {
       if (authorID != null) "authorID": authorID,
       if (imageIDs != null) "imageIDs": imageIDs,
       if (postTime != null) "postTime": postTime!.millisecondsSinceEpoch,
-      if (caption != null) "caption": caption
+      if (caption != null) "caption": caption,
+      if (tag != null) "tag": tag
     };
   }
 }
