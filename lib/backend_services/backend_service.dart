@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:drp/image.dart';
+import 'package:drp/data_types/my_image.dart';
 import 'package:drp/main.dart';
-import 'package:drp/post.dart';
-import 'package:drp/toaster.dart' show Toaster;
+import 'package:drp/data_types/post.dart';
+import 'package:drp/utilities/toaster.dart' show Toaster;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';

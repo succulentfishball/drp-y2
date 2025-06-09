@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:drp/utils.dart' as utils;
+import 'package:drp/utilities/utils.dart' as utils;
 
 class CommentWidget extends StatefulWidget  {
   const CommentWidget({super.key, required this.caption, required this.dateTime, required this.user});

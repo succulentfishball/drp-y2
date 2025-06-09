@@ -1,7 +1,7 @@
 import 'dart:typed_data';
-import 'package:drp/backend_service.dart';
-import 'package:drp/photo_modal.dart';
-import 'package:drp/post.dart';
+import 'package:drp/backend_services/backend_service.dart';
+import 'package:drp/widgets/photo_modal.dart';
+import 'package:drp/data_types/post.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
