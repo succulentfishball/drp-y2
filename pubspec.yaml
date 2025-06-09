@@ -42,6 +42,10 @@ dependencies:
   firebase_auth: ^5.5.4
   fluttertoast: ^8.2.12
   flutter_speed_dial: ^3.0.5
+  uuid: ^4.4.2
+  native_exif: ^0.6.2
+  firebase_storage: ^12.4.6
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:

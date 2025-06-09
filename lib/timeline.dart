@@ -1,21 +1,109 @@
+import 'dart:typed_data';
+
+import 'package:drp/backend_service.dart';
+import 'package:drp/post.dart';
 import 'package:flutter/material.dart';
-import 'package:drp/post_widget.dart';
+import 'package:intl/intl.dart';
+
+bool isLocalImage(String? path) {
+  return path != null && (path.startsWith('/') || path.startsWith('file://'));
+}
 
 class TimelineNodeWidget extends StatefulWidget {
-  final String imageUrl;
-  final String caption;
-  final DateTime dateTime;
-  final String user;
-
-  const TimelineNodeWidget({super.key, required this.imageUrl, required this.dateTime, required this.user, this.caption = ''});
+  final Post post;
+  const PhotoWidget({super.key, required this.post});
 
   @override
   TimelineNodeWidgetState createState() => TimelineNodeWidgetState();
 }
 
-class TimelineNodeWidgetState extends State<TimelineNodeWidget> {
+class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKeepAliveClientMixin {
+  final p1 = "authorDisplayName";
+  final p2 = "creationTime";
+  Future<Uint8List?>? imgData;
+  Future<Map<String, dynamic>>? labelData;
+
+  @override
+  void initState() {
+    String? firstImgID = widget.post.imageIDs![0];
+
+    // Future data
+    imgData = BackEndService.fetchImageFromCloudByID(firstImgID!);
+    labelData = Future(() async {
+      final authorDisplayName = await BackEndService.fetchNameFromUUID(widget.post.authorID!);
+      final img = await BackEndService.fetchImageDataFromDB(widget.post.imageIDs![0]);
+      final time = img!.creationTime;
+      
+      return Future.value({
+        p1: authorDisplayName,
+        p2: time
+      });
+    });
+
+    super.initState();
+  }
+
+  Widget buildLabels(Post post) {
+    // Create future function to communicate with backend
+    return FutureBuilder<Map<String, dynamic>>(
+      future: labelData,
+      builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        String authorDisplayName = "";
+        DateTime creationTime = DateTime.now();
+        if (snapshot.connectionState == ConnectionState.waiting){
+          authorDisplayName = 'loading...';
+        } else {
+          if (snapshot.hasError) {
+            print('Error: ${snapshot.error}');
+          } else if (snapshot.hasData) {
+            authorDisplayName = snapshot.data![p1];
+            creationTime = snapshot.data![p2];
+          } else {
+            authorDisplayName = "No data :(";
+            creationTime = DateTime.now();
+          }
+        }
+
+        // Generate label widgets
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              authorDisplayName,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
+            ),
+            Text(
+              "${DateFormat.yMMMMd().format(creationTime)} ${DateFormat('jm').format(creationTime)}",
+              style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
+            ),
+          ],
+        );
+      }
+    );
+  }
+
+  Widget buildImage() {
+    return FutureBuilder(
+      future: imgData, 
+      builder: (context, snapshot) {
+        print("Future interaction");
+        if (snapshot.hasError) {
+          return Text("Error encountered");
+        } else if (snapshot.hasData) {
+          return Image.memory(
+            snapshot.data!,
+            fit: BoxFit.fitWidth,
+          );
+        } else {
+          return Text("Loading image...");
+        }
+      }
+    );
+  }
   @override
   Widget build(BuildContext context) {
+    String? caption = widget.post.caption;
+
     return 
     IntrinsicHeight(
       child: Row(
@@ -68,12 +156,86 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> {
                 Spacer(),
               ],
             ),
-            // actual timeline post
-            PostWidget(imageUrl: widget.imageUrl, caption: widget.caption, dateTime: widget.dateTime, user: widget.user),
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: buildLabels(widget.post)
+                    ),
+                    Center(
+                      child: Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => Text("hi")//PhotoModal(
+                                //   data: imgData!, 
+                                //   caption: caption, 
+                                //   dateTime: creationTime, 
+                                //   user: authorName!
+                                // ),
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16.0),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: buildImage()
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 8,
+                            right: 8,
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
+                                borderRadius: BorderRadius.circular(16.0),
+                              ),
+                              child: Text(
+                                // todo replies
+                                "2 Replies",
+                                style: TextStyle(
+                                  fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]
+                      ),
+                    ),
+                    if (caption != null && caption != '') (
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: 
+                        Text(
+                          caption,
+                          style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
+                        ),
+                      )
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ]
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class TimelineWidget extends StatefulWidget {
@@ -87,12 +249,15 @@ class TimelineWidget extends StatefulWidget {
 
 class TimelineWidgetState extends State<TimelineWidget> {
   late ScrollController _scrollController;
+  Widget? kids;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
+
+    print("initialising timeline state");
   }
 
   void _scrollListener() {
@@ -131,10 +296,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
         itemBuilder: (context, index) {
           return TimelineNodeWidget(
               key: widget.photoKeys[index],
-              imageUrl: widget.photos[index].imageUrl,
-              dateTime: widget.photos[index].dateTime,
-              user: widget.photos[index].user,
-              caption: widget.photos[index].caption,
+              post: widget.photos[index].post
             );
         },
       )

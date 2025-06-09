@@ -1,4 +1,5 @@
 import 'package:drp/auth_service.dart';
+import 'package:drp/backend_service.dart';
 import 'package:drp/toaster.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,13 +30,15 @@ class LoginModalState extends State<LoginModal> {
     if (_formKey.currentState!.validate()) {
       if (_isSignedIn) {
         // --- Case: Logging out ---
-        Toaster().displayAuthToast("Goodbye ${FirebaseAuth.instance.currentUser!.email}!");
+        final name = await BackEndService.fetchNameFromUUID(BackEndService.userID!);
+        Toaster().displayAuthToast("Goodbye $name!");
         await FirebaseAuth.instance.signOut(); 
         if (context.mounted) Navigator.pushNamed(context, "/");
 
         setState(() {
           _isRegistering = false;
           _isSignedIn = false;
+          BackEndService.clearUserData();
         });
       } else {
         if (_isRegistering) {
