@@ -1,5 +1,6 @@
 
 import 'package:drp/backend_services/backend_service.dart';
+import 'package:drp/data_types/comment.dart';
 import 'package:drp/main.dart';
 import 'package:drp/data_types/post.dart';
 import 'package:flutter/material.dart';
@@ -19,30 +20,28 @@ class PhotoModalState extends State<PhotoModal> {
 
   @override
   void initState() {
+    comments.add(
+      CommentWidget(
+        comment: Comment(
+          message: widget.post.caption!, 
+          postTime: widget.post.postTime!, 
+          authorID: widget.post.authorID!
+        )
+      )
+    );
+    
     super.initState();
-  }
-
-  Future<CommentWidget> _buildPostComment() async {
-    final String? username = await BackEndService.fetchNameFromUUID(widget.post.authorID!);
-    return CommentWidget(caption: widget.post.caption!, dateTime: widget.post.postTime!, user: username!);
-  }
-
-  List<CommentWidget> _dummyComments() {
-    return [
-      CommentWidget(caption: "where is this?", dateTime: DateTime.now(), user: "me"),
-      CommentWidget(caption: "we went xxx today, it was qwertyuiopasdfghjklzxcvbnm", dateTime: DateTime.now(), user: "Dad"),
-    ];
   }
 
   void _addComment() {
     final value = _controller.text.trim();
     if (value.isNotEmpty) {
       setState(() {
-        comments.add(CommentWidget(
-          caption: value,
-          dateTime: DateTime.now(),
-          user: "me",
-        ));
+        comments.add(CommentWidget(comment: Comment(
+          message: value,
+          postTime: DateTime.now(),
+          authorID: BackEndService.userID,
+        )));
         _controller.clear(); // Clear the text field after submission
       });
     }
@@ -85,25 +84,11 @@ class PhotoModalState extends State<PhotoModal> {
               child: Scrollbar(
                 thumbVisibility: true,
                 // This will require stream builder
-                child: FutureBuilder(
-                  future: _buildPostComment(), 
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) { return Text("Loading comments..."); }
-
-                    comments.add(snapshot.data!);
-                    
-                    // Dummy comments
-                    if (testMode) { 
-                      comments.addAll(_dummyComments()); 
-                    }
-
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: comments.length,
-                      itemBuilder: (context, index) {
-                        return comments[index];
-                      },
-                    );
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: comments.length,
+                  itemBuilder: (context, index) {
+                    return comments[index];
                   }
                 )
               ),
