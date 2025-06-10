@@ -152,6 +152,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
                 Spacer(),
               ],
             ),
+            // actual post container
             Expanded(
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
