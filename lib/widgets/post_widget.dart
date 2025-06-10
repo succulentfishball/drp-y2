@@ -40,88 +40,78 @@ class PostWidgetState extends State<PostWidget> {
       child: AspectRatio(
         aspectRatio: 3 / 4,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
           decoration: BoxDecoration(
             image: _getFrameDecoration(),
             color: hasCustomFrame ? null : Colors.white,
-            border: hasCustomFrame ? null : Border.all(color: Colors.grey.shade300, width: 2),
+            border: hasCustomFrame ? Border.all(color: Colors.black, width: 2) : Border.all(color: Colors.grey.shade300, width: 2),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Stack(
+          child: Column(
             children: [
-              Column(
+              // details for user and time at the top
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // details for user and time at the top
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.authorDisplayName,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
-                      ),
-                      Text(
-                        widget.creationDisplayTime,
-                        style: TextStyle(fontSize: Theme.of(context).textTheme.titleLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
-                      ),
-                    ],
+                  Text(
+                    widget.authorDisplayName,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
                   ),
-                  SizedBox(height: 12),
-                  // image with click detector if not posting
-                  GestureDetector(
-                    onTap: () {
-                      if (widget.post != null) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => PhotoModal(post: widget.post!),
-                        );
-                      }
-                    },
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      height: MediaQuery.of(context).size.width * 0.8 * 4 / 3,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: FittedBox(
-                          fit: BoxFit.cover,
-                          child: widget.image,
+                  Text(
+                    widget.creationDisplayTime,
+                    style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
+                  ),
+                ],
+              ),
+              // image with click detector if not posting
+              Expanded(
+                child: Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (widget.post != null) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => PhotoModal(post: widget.post!),
+                          );
+                        }
+                      },
+                      child: widget.image
+                    ),
+                    Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        child: Text(
+                          // todo replies
+                          "${widget.replyCount} Replies",
+                          style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 12),
-                  // caption at the bottom
-                  if (widget.caption != '') (
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: 
-                      Text(
-                        widget.caption,
-                        style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer, backgroundColor: Colors.white)
-                      ),
-                    )
-                  ),
-                ]
-              ),
-              Positioned(
-                bottom: 4,
-                right: 4,
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                  child: Text(
-                    // todo replies
-                    "${widget.replyCount} Replies",
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                    ),
-                  ),
+                  ]
                 ),
               ),
-            ],
+              // caption at the bottom
+              if (widget.caption != '') (
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: 
+                  Text(
+                    widget.caption,
+                    style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer, backgroundColor: Colors.white)
+                  ),
+                )
+              ),
+            ]
           ),
         ),
       ),

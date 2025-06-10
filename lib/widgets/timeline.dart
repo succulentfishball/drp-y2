@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 import 'package:drp/backend_services/backend_service.dart';
-import 'package:drp/widgets/photo_modal.dart';
+import 'package:drp/data_types/my_image.dart';
 import 'package:drp/data_types/my_post.dart';
+import 'package:drp/widgets/post_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:drp/utilities/utils.dart' as utils;
 
 class TimelineNodeWidget extends StatefulWidget {
   final Post post;
@@ -14,91 +15,48 @@ class TimelineNodeWidget extends StatefulWidget {
 }
 
 class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKeepAliveClientMixin {
-  final p1 = "authorDisplayName";
-  final p2 = "creationTime";
-  Future<Uint8List?>? imgData;
-  Future<Map<String, dynamic>>? labelData;
+  Widget buildPostWidget(Post post) {
+    final Future<String?> authorDisplayNameFuture = BackEndService.fetchNameFromUUID(post.authorID!);
+    final Future<Uint8List?> imgDataFuture = BackEndService.fetchImageFromCloudByID(widget.post.imageIDs![0]);
+    final Future<MyImage?> imgFuture = BackEndService.fetchImageDataFromDB(post.imageIDs![0]);
+    final Future<DateTime?> creationTimeFuture = imgFuture.then((img) => img?.creationTime);
 
-  @override
-  void initState() {
-    String? firstImgID = widget.post.imageIDs![0];
+    return FutureBuilder<List<dynamic>>(
+      future: Future.wait([
+        authorDisplayNameFuture,
+        imgDataFuture,
+        creationTimeFuture,
+      ]),
+      builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        if (snapshot.connectionState != ConnectionState.waiting && !snapshot.hasError && snapshot.hasData) {
+          String authorDisplayName = snapshot.data![0] ?? '';
+          DateTime creationTime = snapshot.data![2] ?? DateTime.now();
 
-    // Future data
-    imgData = BackEndService.fetchImageFromCloudByID(firstImgID!);
-    labelData = Future(() async {
-      final authorDisplayName = await BackEndService.fetchNameFromUUID(widget.post.authorID!);
-      final img = await BackEndService.fetchImageDataFromDB(widget.post.imageIDs![0]);
-      final time = img!.creationTime;
-      
-      return Future.value({
-        p1: authorDisplayName,
-        p2: time
-      });
-    });
-
-    super.initState();
-  }
-
-  Widget buildLabels(Post post) {
-    // Create future function to communicate with backend
-    return FutureBuilder<Map<String, dynamic>>(
-      future: labelData,
-      builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-        String authorDisplayName = "";
-        DateTime creationTime = DateTime.now();
-        if (snapshot.connectionState == ConnectionState.waiting){
-          authorDisplayName = 'loading...';
-        } else {
-          if (snapshot.hasError) {
-            print('Error: ${snapshot.error}');
-          } else if (snapshot.hasData) {
-            authorDisplayName = snapshot.data![p1];
-            creationTime = snapshot.data![p2];
-          } else {
-            authorDisplayName = "No data :(";
-            creationTime = DateTime.now();
-          }
-        }
-
-        // Generate label widgets
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              authorDisplayName,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
+          return Padding(
+            padding: EdgeInsetsGeometry.all(4),
+            child: PostWidget(
+              image: Image.memory(
+                snapshot.data![1],
+                fit: BoxFit.fitWidth,
+              ),
+              authorDisplayName: authorDisplayName,
+              creationDisplayTime: '${utils.date(creationTime)} ${utils.time(creationTime)}',
+              caption: widget.post.caption ?? '',
+              tag: widget.post.tag ?? '',
+              replyCount: 0,
+              post: widget.post,
             ),
-            Text(
-              "${DateFormat.yMMMMd().format(creationTime)} ${DateFormat('jm').format(creationTime)}",
-              style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
-            ),
-          ],
-        );
-      }
-    );
-  }
-
-  Widget buildImage() {
-    return FutureBuilder(
-      future: imgData, 
-      builder: (context, snapshot) {
-        print("Future interaction building image in timeline.dart");
-        if (snapshot.hasError) {
-          return Text("Error encountered");
-        } else if (snapshot.hasData) {
-          return Image.memory(
-            snapshot.data!,
-            fit: BoxFit.fitWidth,
           );
         } else {
-          return Text("Loading image...");
+          return Text("Loading post...");
         }
       }
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    String? caption = widget.post.caption;
+    super.build(context);
 
     return 
     IntrinsicHeight(
@@ -154,76 +112,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
             ),
             // actual post container
             Expanded(
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // details for user and time at the top
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: buildLabels(widget.post)
-                    ),
-                    // image with click detector
-                    Center(
-                      child: Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => PhotoModal(post: widget.post),
-                              );
-                            },
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16.0),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: buildImage()
-                              ),
-                            ),
-                          ),
-                          // reply count
-                          Positioned(
-                            bottom: 8,
-                            right: 8,
-                            child: Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
-                                borderRadius: BorderRadius.circular(16.0),
-                              ),
-                              child: Text(
-                                // todo replies
-                                "2 Replies",
-                                style: TextStyle(
-                                  fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-                                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ]
-                      ),
-                    ),
-                    // caption at the bottom
-                    if (caption != null && caption != '') (
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: 
-                        Text(
-                          caption,
-                          style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer)
-                        ),
-                      )
-                    ),
-                  ],
-                ),
-              ),
+              child: buildPostWidget(widget.post),
             ),
           ]
       ),
