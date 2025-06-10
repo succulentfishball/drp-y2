@@ -1,13 +1,9 @@
 import 'dart:typed_data';
 import 'package:drp/backend_services/backend_service.dart';
 import 'package:drp/widgets/photo_modal.dart';
-import 'package:drp/data_types/post.dart';
+import 'package:drp/data_types/my_post.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-bool isLocalImage(String? path) {
-  return path != null && (path.startsWith('/') || path.startsWith('file://'));
-}
 
 class TimelineNodeWidget extends StatefulWidget {
   final Post post;
@@ -166,10 +162,12 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // details for user and time at the top
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: buildLabels(widget.post)
                     ),
+                    // image with click detector
                     Center(
                       child: Stack(
                         children: [
@@ -188,6 +186,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
                               ),
                             ),
                           ),
+                          // reply count
                           Positioned(
                             bottom: 8,
                             right: 8,
@@ -210,6 +209,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
                         ]
                       ),
                     ),
+                    // caption at the bottom
                     if (caption != null && caption != '') (
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),

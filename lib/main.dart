@@ -16,7 +16,7 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:drp/data_types/my_user.dart';
-import 'package:drp/data_types/post.dart';
+import 'package:drp/data_types/my_post.dart';
 import 'package:drp/data_types/my_image.dart';
 import 'package:drp/pages/pre_post.dart';
 

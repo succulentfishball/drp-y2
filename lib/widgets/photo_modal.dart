@@ -1,7 +1,7 @@
 
 import 'package:drp/backend_services/backend_service.dart';
 import 'package:drp/main.dart';
-import 'package:drp/data_types/post.dart';
+import 'package:drp/data_types/my_post.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/widgets/comment_widget.dart';
 
