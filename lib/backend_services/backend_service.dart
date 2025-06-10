@@ -64,8 +64,8 @@ class BackEndService {
     final islandRef = storageRef.child("images/$groupID/$imgID.jpg");
     try {
       print("Trying to download $imgID from cloud...");
-      const oneMegabyte = 1024 * 1024;
-      return await islandRef.getData(oneMegabyte);
+      const fileSizeCap = 10 * 1024 * 1024; // 10MB
+      return await islandRef.getData(fileSizeCap);
     } on FirebaseException catch (e) {
       print("Error encountered when downloading image from cloud");
       Toaster().displayAuthToast("Failed to retrieve image from cloud... Error: $e");
