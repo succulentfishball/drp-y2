@@ -1,12 +1,12 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drp/data_types/comment.dart';
 import 'package:drp/data_types/my_image.dart';
 import 'package:drp/main.dart';
 import 'package:drp/data_types/post.dart';
 import 'package:drp/utilities/toaster.dart' show Toaster;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 const maxUsernameLength = 5;
@@ -76,6 +76,11 @@ class BackEndService {
   static Future<MyImage?> fetchImageDataFromDB(String imgID) async {
     final snapshot = await dbRef.collection("Group_Data").doc(groupID).collection("Images").doc(imgID).get();
     return MyImage.fromFirestore(snapshot, null);
+  } 
+
+  // Care should be taken with snapshots to avoid StreamBuilders from breaking
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllCommentSnapshotsFromChat(chatID) {
+    return dbRef.collection("Group_Data").doc(groupID!).collection("Chat").doc(chatID).collection("Messages").snapshots();
   } 
 
   static String? getGroupID() { return groupID; }

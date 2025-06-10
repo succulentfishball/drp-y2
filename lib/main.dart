@@ -108,8 +108,8 @@ class _MyHomePageState extends State<MyHomePage> {
         await dbRef.collection("Group_Data").doc(userData!.groupID!).collection("Posts").doc(postID).set(
           newPost.toFirestore()
         );
-        await dbRef.collection("Group_Data").doc(userData!.groupID).collection("Chat").doc(chatID).set(
-          {"messages": [initialComment.toFirestore()]}
+        await dbRef.collection("Group_Data").doc(userData!.groupID).collection("Chat").doc(chatID).collection("Messages").doc().set(
+          initialComment.toFirestore()
         );
 
         setState(() {});

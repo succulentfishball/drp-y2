@@ -1,7 +1,6 @@
 
 import 'package:drp/backend_services/backend_service.dart';
 import 'package:drp/data_types/comment.dart';
-import 'package:drp/main.dart';
 import 'package:drp/data_types/post.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/widgets/comment_widget.dart';
@@ -18,30 +17,11 @@ class PhotoModalState extends State<PhotoModal> {
   final TextEditingController _controller = TextEditingController();
   List<CommentWidget> comments = [];
 
-  @override
-  void initState() {
-    comments.add(
-      CommentWidget(
-        comment: Comment(
-          message: widget.post.caption!, 
-          postTime: widget.post.postTime!, 
-          authorID: widget.post.authorID!
-        )
-      )
-    );
-    
-    super.initState();
-  }
-
   void _addComment() {
     final value = _controller.text.trim();
     if (value.isNotEmpty) {
       setState(() {
-        comments.add(CommentWidget(comment: Comment(
-          message: value,
-          postTime: DateTime.now(),
-          authorID: BackEndService.userID,
-        )));
+        // Send comment to database
         _controller.clear(); // Clear the text field after submission
       });
     }
@@ -83,12 +63,38 @@ class PhotoModalState extends State<PhotoModal> {
             Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
-                // This will require stream builder
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    return comments[index];
+                child: StreamBuilder(
+                  stream: BackEndService.getAllCommentSnapshotsFromChat(widget.post.chatID!), 
+                  builder: (context, snapshot) {
+                    print("in builder");
+                    if (snapshot.hasData) {
+                      print("snapshot has data");
+                      comments.clear();
+                      for (final doc in snapshot.data!.docs) {
+                        print("doc $doc");
+                        comments.add(CommentWidget(comment: Comment.fromFirestore(doc, null)));
+                        print("comments length = ${comments.length}");
+                      }
+
+                      comments.sort((a, b) => (a.comment.postTime!.compareTo(b.comment.postTime!)));
+
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: comments.length,
+                        itemBuilder: (context, index) {
+                          return comments[index];
+                        }
+                      );
+
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 1,
+                        itemBuilder: (_, _) {
+                          return Text("Loading comments...");
+                        }
+                      );
+                    }
                   }
                 )
               ),
