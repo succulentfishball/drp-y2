@@ -63,6 +63,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final bool isChefTag = _selectedTag == "Trying to Chef!";
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -79,10 +80,16 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
           Center(
             child: Container(
               margin: const EdgeInsets.only(top: 40, bottom: 180),
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 72), // thicker bottom border
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
               decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300, width: 2),
+                image: isChefTag
+                  ? DecorationImage(
+                      image: AssetImage("assets/photoframes/foodframe.png"),
+                      fit: BoxFit.fill,
+                    )
+                  : null,
+                color: isChefTag ? null : Colors.white,
+                border: isChefTag ? null : Border.all(color: Colors.grey.shade300, width: 2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SizedBox(
@@ -113,7 +120,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                         height: 300,
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.75), // more opaque
+                          color: Colors.white.withOpacity(0.75),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListView(
