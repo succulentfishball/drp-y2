@@ -30,12 +30,18 @@ class PostWidgetState extends State<PostWidget> {
         fit: BoxFit.fill,
       );
     }
+    else if (widget.tag == "Postcards from home") {
+      return const DecorationImage(
+        image: AssetImage("assets/photoframes/postcardframe.png"),
+        fit: BoxFit.fill,
+      );
+    }
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool hasCustomFrame = widget.tag == "Trying to Chef!" || widget.tag == "Pets from home";
+    final bool hasCustomFrame = widget.tag == "Trying to Chef!" || widget.tag == "Pets from home" || widget.tag == "Postcards from home";
     return Center(
       child: AspectRatio(
         aspectRatio: 3 / 4,
@@ -50,19 +56,42 @@ class PostWidgetState extends State<PostWidget> {
           child: Column(
             children: [
               // details for user and time at the top
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Author pill
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85),  // 85% opaque white
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
                     widget.authorDisplayName,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+                      color: Colors.black87,             // ensure legibility
+                    ),
                   ),
-                  Text(
+                ),
+                // Timestamp pill
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
                     widget.creationDisplayTime,
-                    style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium?.fontSize, color: Theme.of(context).colorScheme.onPrimaryFixedVariant)
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+                      color: Colors.black87,
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
               // image with click detector if not posting
               Expanded(
                 child: Stack(

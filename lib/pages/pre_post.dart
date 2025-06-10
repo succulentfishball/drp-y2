@@ -74,13 +74,18 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
         image: AssetImage("assets/photoframes/petframe.png"),
         fit: BoxFit.fill,
       );
+    } else if (_selectedTag == "Postcards from home") {
+      return const DecorationImage(
+        image: AssetImage("assets/photoframes/postcardframe.png"),
+        fit: BoxFit.fill,
+      );
     }
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool hasCustomFrame = _selectedTag == "Trying to Chef!" || _selectedTag == "Pets from home";
+    final bool hasCustomFrame = _selectedTag == "Trying to Chef!" || _selectedTag == "Pets from home" || _selectedTag == "Postcards from home";
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -95,15 +100,22 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
             ),
           ),
           PostWidget(
-            image: Image.file(
-              File(widget.imageFile.path),
-              fit: BoxFit.cover,
+            image: FractionallySizedBox(
+              widthFactor: 0.9,
+              heightFactor: 0.9,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(
+                  File(widget.imageFile.path),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             authorDisplayName: 'me',
             creationDisplayTime: 'now',
             caption: _captionController.text,
             tag: _selectedTag ?? '',
-            replyCount: 0
+            replyCount: 0,
           ),
           Align(
             alignment: Alignment.bottomCenter,
