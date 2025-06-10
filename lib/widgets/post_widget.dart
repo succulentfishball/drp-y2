@@ -1,6 +1,6 @@
+import 'package:drp/data_types/my_post.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/widgets/photo_modal.dart';
-import 'package:drp/data_types/my_post.dart';
 
 class PostWidget extends StatefulWidget {
   const PostWidget({super.key, required this.image, required this.authorDisplayName, required this.creationDisplayTime, required this.caption, required this.tag, required this.replyCount, this.post});
@@ -11,7 +11,7 @@ class PostWidget extends StatefulWidget {
   final String tag;
   final int replyCount;
   // post will only exist if it is part of the timeline
-  final Post? post;
+  final MyPost? post;
 
   @override
   PostWidgetState createState() => PostWidgetState();

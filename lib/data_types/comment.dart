@@ -1,38 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MyPost {
+class Comment {
   String? authorID;
-  List? imageIDs;
-  String? chatID;
   DateTime? postTime;
-  String? caption;
-  String? tag;
+  String? message;
 
-  MyPost({this.authorID, this.imageIDs, this.chatID, this.postTime, this.caption, this.tag});
+  Comment({this.authorID, this.postTime, this.message});
 
-  factory MyPost.fromFirestore(
+  factory Comment.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
     final data = snapshot.data();
-    return MyPost(
+    return Comment(
       authorID: data?['authorID'],
-      imageIDs: data?['imageIDs'],
-      chatID: data?['chatID'],
       postTime: DateTime.fromMillisecondsSinceEpoch(data?['postTime']),
-      caption: data?['caption'],
-      tag: data?['tag'],
+      message: data?['message']
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
       if (authorID != null) "authorID": authorID,
-      if (imageIDs != null) "imageIDs": imageIDs,
-      if (chatID != null) "chatID": chatID,
       if (postTime != null) "postTime": postTime!.millisecondsSinceEpoch,
-      if (caption != null) "caption": caption,
-      if (tag != null) "tag": tag
+      if (message != null) "message": message
     };
   }
 }

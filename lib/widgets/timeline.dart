@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:drp/utilities/utils.dart' as utils;
 
 class TimelineNodeWidget extends StatefulWidget {
-  final Post post;
+  final MyPost post;
   const TimelineNodeWidget({super.key, required this.post});
 
   @override
@@ -15,7 +15,7 @@ class TimelineNodeWidget extends StatefulWidget {
 }
 
 class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKeepAliveClientMixin {
-  Widget buildPostWidget(Post post) {
+  Widget buildPostWidget(MyPost post) {
     final Future<String?> authorDisplayNameFuture = BackEndService.fetchNameFromUUID(post.authorID!);
     final Future<Uint8List?> imgDataFuture = BackEndService.fetchImageFromCloudByID(widget.post.imageIDs![0]);
     final Future<MyImage?> imgFuture = BackEndService.fetchImageDataFromDB(post.imageIDs![0]);

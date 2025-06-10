@@ -1,11 +1,11 @@
+import 'package:drp/backend_services/backend_service.dart';
+import 'package:drp/data_types/comment.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/utilities/utils.dart' as utils;
 
 class CommentWidget extends StatefulWidget  {
-  const CommentWidget({super.key, required this.caption, required this.dateTime, required this.user});
-  final String caption;
-  final DateTime dateTime;
-  final String user;
+  const CommentWidget({super.key, required this.comment});
+  final Comment comment;
 
   @override
   State<CommentWidget> createState() => CommentWidgetState();
@@ -28,9 +28,18 @@ class CommentWidgetState extends State<CommentWidget> {
           color: Theme.of(context).colorScheme.onSurfaceVariant
         ),
       ),
-      title: Text(widget.user),
-      subtitle: Text(widget.caption),
-      trailing: Text("${utils.date(widget.dateTime)}\n${utils.time(widget.dateTime)}"),
-    );
+      title: FutureBuilder(
+        future: BackEndService.fetchNameFromUUID(widget.comment.authorID!),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Text("Loading username of author...");
+          } else {
+            return Text(snapshot.data!);
+          }
+        },
+      ),
+      subtitle: Text(widget.comment.message!),
+      trailing: Text("${utils.date(widget.comment.postTime!)}\n${utils.time(widget.comment.postTime!)}"),
+    ); 
   }
 }
