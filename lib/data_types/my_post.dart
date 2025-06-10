@@ -1,25 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Post {
+class MyPost {
   String? authorID;
   List? imageIDs;
   String? chatID;
   DateTime? postTime;
   String? caption;
+  String? tag;
 
-  Post({this.authorID, this.imageIDs, this.chatID, this.postTime, this.caption});
+  MyPost({this.authorID, this.imageIDs, this.chatID, this.postTime, this.caption, this.tag});
 
-  factory Post.fromFirestore(
+  factory MyPost.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
     final data = snapshot.data();
-    return Post(
+    return MyPost(
       authorID: data?['authorID'],
       imageIDs: data?['imageIDs'],
       chatID: data?['chatID'],
       postTime: DateTime.fromMillisecondsSinceEpoch(data?['postTime']),
       caption: data?['caption'],
+      tag: data?['tag'],
     );
   }
 
@@ -29,7 +31,8 @@ class Post {
       if (imageIDs != null) "imageIDs": imageIDs,
       if (chatID != null) "chatID": chatID,
       if (postTime != null) "postTime": postTime!.millisecondsSinceEpoch,
-      if (caption != null) "caption": caption
+      if (caption != null) "caption": caption,
+      if (tag != null) "tag": tag
     };
   }
 }

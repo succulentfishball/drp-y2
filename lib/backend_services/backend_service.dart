@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp/data_types/comment.dart';
 import 'package:drp/data_types/my_image.dart';
 import 'package:drp/main.dart';
-import 'package:drp/data_types/post.dart';
+import 'package:drp/data_types/my_post.dart';
 import 'package:drp/utilities/toaster.dart' show Toaster;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -46,11 +46,11 @@ class BackEndService {
     return snapshot["name"];
   } 
 
-  static Future<List<Post>> fetchAllPostsFromGroup() async {
+  static Future<List<MyPost>> fetchAllPostsFromGroup() async {
     final res = await dbRef.collection("Group_Data").doc(groupID).collection("Posts").get();
-    List<Post> posts = List.empty(growable: true);
+    List<MyPost> posts = List.empty(growable: true);
     for (final doc in res.docs) {
-      posts.add(Post.fromFirestore(doc, null));
+      posts.add(MyPost.fromFirestore(doc, null));
     }
     return posts;
   } 
@@ -61,11 +61,11 @@ class BackEndService {
   } 
 
   static Future<Uint8List?> fetchImageFromCloudByID(String imgID) async {
-    final islandRef = storageRef.child("images/$groupID/$imgID.jpg");
+    final ref = storageRef.child("images/$groupID/$imgID.jpg");
     try {
       print("Trying to download $imgID from cloud...");
       const oneMegabyte = 1024 * 1024;
-      return await islandRef.getData(oneMegabyte);
+      return await ref.getData(oneMegabyte);
     } on FirebaseException catch (e) {
       print("Error encountered when downloading image from cloud");
       Toaster().displayAuthToast("Failed to retrieve image from cloud... Error: $e");
@@ -80,6 +80,7 @@ class BackEndService {
 
   // Care should be taken with snapshots to avoid StreamBuilders from breaking
   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllCommentSnapshotsFromChat(chatID) {
+    print("Getting comments");
     return dbRef.collection("Group_Data").doc(groupID!).collection("Chat").doc(chatID).collection("Messages").snapshots();
   } 
 

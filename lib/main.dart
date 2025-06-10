@@ -17,8 +17,9 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:drp/data_types/my_user.dart';
-import 'package:drp/data_types/post.dart';
+import 'package:drp/data_types/my_post.dart';
 import 'package:drp/data_types/my_image.dart';
+import 'package:drp/pages/pre_post.dart';
 
 const bool testMode = false;
 const String dummyGroupID = "9366e9b0-415b-11f0-bf9f-b5479dd77560";
@@ -70,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final storageRef = FirebaseStorage.instance.ref(); 
   final dbRef = FirebaseFirestore.instance;
 
-  void uploadPhoto(XFile file) async {
+  void uploadPhoto(XFile file, String caption, String? tag) async {
     // String imageUrl = 'https://picsum.photos/250';
     // Get meta data and file data
     final exif = await Exif.fromPath(file.path);
@@ -93,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // Upload post and correlating chat data
         final postID = Uuid().v1();
         final chatID = Uuid().v1();
-        Post newPost = Post(
+        MyPost newPost = MyPost(
           authorID: BackEndService.userID, 
           imageIDs: [imgID], 
           chatID: chatID,
@@ -127,9 +128,23 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> takePhoto() async {
     final XFile? photo = await picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
-      uploadPhoto(photo);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PrePostPage(
+            imageFile: photo,
+            onPost: ({required String caption, String? tag, required XFile image}) {
+              // Replace this with your actual upload logic
+              uploadPhoto(image, caption, tag);
+              print("Caption: $caption");
+              print("Tag: $tag");
+            },
+          ),
+        ),
+      );
     }
   }
+
 
   Future<void> openCalendar() async {
     // todo open calendar functionality
@@ -149,7 +164,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> pickPhoto() async {
     final XFile? photo = await picker.pickImage(source: ImageSource.gallery, imageQuality: 5);
     if (photo != null) {
-      uploadPhoto(photo);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PrePostPage(
+            imageFile: photo,
+            onPost: ({required String caption, String? tag, required XFile image}) {
+              // Replace this with your actual upload logic
+              uploadPhoto(image, caption, tag);
+              print("Caption: $caption");
+              print("Tag: $tag");
+            },
+          ),
+        ),
+      );
     }
   }
 
@@ -232,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
             photos.clear();
             for (final doc in snapshot.data!.docs) {
               GlobalKey<TimelineNodeWidgetState> key = GlobalKey<TimelineNodeWidgetState>();
-              photos.add(TimelineNodeWidget(key: key, post: Post.fromFirestore(doc, null)));
+              photos.add(TimelineNodeWidget(key: key, post: MyPost.fromFirestore(doc, null)));
               photoKeys.add(key);
             }
 
