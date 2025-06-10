@@ -33,7 +33,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
           DateTime creationTime = snapshot.data![2] ?? DateTime.now();
 
           return Padding(
-            padding: EdgeInsetsGeometry.all(4),
+            padding: EdgeInsetsGeometry.fromLTRB(4, 8, 0, 8),
             child: PostWidget(
               image: Image.memory(
                 snapshot.data![1],
@@ -49,9 +49,9 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
           );
         } else {
           if (snapshot.hasError) {
-            return Text("Loading post... (${snapshot.error})");
+            return Center(child: Text("Loading post... (${snapshot.error})"));
           } else {
-            return Text("Loading post... (no data)");
+            return Center(child: Text("Loading post... (no data)"));
           }
         }
       }
@@ -106,7 +106,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
               children: [
                 Spacer(),
                 Container(
-                  width: 64,
+                  width: 32,
                   height: 4,
                   color: Theme.of(context).colorScheme.surfaceTint,
                   margin: EdgeInsets.symmetric(horizontal: 8),
@@ -176,7 +176,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: ListView.builder(
         // controller: _scrollController,
         itemCount: widget.photos.length,

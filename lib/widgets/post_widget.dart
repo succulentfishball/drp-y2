@@ -94,50 +94,61 @@ class PostWidgetState extends State<PostWidget> {
             ),
               // image with click detector if not posting
               Expanded(
-                child: Stack(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        if (widget.post != null) {
-                          showDialog(
-                            context: context,
-                            builder: (context) => PhotoModal(post: widget.post!),
-                          );
-                        }
-                      },
-                      child: widget.image
-                    ),
-                    Positioned(
-                      bottom: 4,
-                      right: 4,
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: Text(
-                          // todo replies
-                          "${widget.replyCount} Replies",
-                          style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                child: Center(
+                  child: Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          if (widget.post != null) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => PhotoModal(post: widget.post!),
+                            );
+                          }
+                        },
+                        child: widget.image
+                      ),
+                      Positioned(
+                        bottom: 4,
+                        right: 4,
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          child: Text(
+                            // todo replies
+                            "${widget.replyCount} Replies",
+                            style: TextStyle(
+                              fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                              color: Theme.of(context).colorScheme.onSecondaryContainer,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ]
+                    ]
+                  ),
                 ),
               ),
               // caption at the bottom
               if (widget.caption != '') (
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: 
-                  Text(
-                    widget.caption,
-                    style: TextStyle(fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize, color: Theme.of(context).colorScheme.onPrimaryContainer, backgroundColor: Colors.white)
-                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.85),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      widget.caption,
+                      style: TextStyle(
+                        fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ), 
                 )
               ),
             ]

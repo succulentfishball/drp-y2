@@ -280,7 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       ),
       floatingActionButton: SpeedDial(
-        marginEnd: MediaQuery.sizeOf(context).width - 32 - 4,
+        marginEnd: MediaQuery.sizeOf(context).width - 32,
         marginBottom: 8,
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
