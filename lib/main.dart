@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:drp/backend_services/backend_service.dart';
+import 'package:drp/data_types/comment.dart';
 import 'package:drp/utilities/toaster.dart';
 import 'package:drp/utilities/utils.dart' as utils;
 import 'package:firebase_auth/firebase_auth.dart' as firebase_core;
@@ -20,7 +21,7 @@ import 'package:drp/data_types/my_post.dart';
 import 'package:drp/data_types/my_image.dart';
 import 'package:drp/pages/pre_post.dart';
 
-const bool testMode = true;
+const bool testMode = false;
 const String dummyGroupID = "9366e9b0-415b-11f0-bf9f-b5479dd77560";
 MyUser? userData;
 
@@ -90,11 +91,26 @@ class _MyHomePageState extends State<MyHomePage> {
           newImg.toFirestore()
         );
 
-        // Upload post data, tags logic TBC
+        // Upload post and correlating chat data
         final postID = Uuid().v1();
-        Post newPost = Post(authorID: BackEndService.userID, imageIDs: [imgID], caption: caption, tag: tag, postTime: DateTime.now());
+        final chatID = Uuid().v1();
+        MyPost newPost = MyPost(
+          authorID: BackEndService.userID, 
+          imageIDs: [imgID], 
+          chatID: chatID,
+          caption: caption, 
+          postTime: DateTime.now()
+        );
+        Comment initialComment = Comment(
+          authorID: BackEndService.userID,
+          postTime: DateTime.now(),
+          message: caption
+        );
         await dbRef.collection("Group_Data").doc(userData!.groupID!).collection("Posts").doc(postID).set(
           newPost.toFirestore()
+        );
+        await dbRef.collection("Group_Data").doc(userData!.groupID).collection("Chat").doc(chatID).collection("Messages").doc().set(
+          initialComment.toFirestore()
         );
 
         setState(() {});
@@ -244,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
             photos.clear();
             for (final doc in snapshot.data!.docs) {
               GlobalKey<TimelineNodeWidgetState> key = GlobalKey<TimelineNodeWidgetState>();
-              photos.add(TimelineNodeWidget(key: key, post: Post.fromFirestore(doc, null)));
+              photos.add(TimelineNodeWidget(key: key, post: MyPost.fromFirestore(doc, null)));
               photoKeys.add(key);
             }
 

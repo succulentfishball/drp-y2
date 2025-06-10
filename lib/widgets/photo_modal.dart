@@ -1,13 +1,14 @@
 
 import 'package:drp/backend_services/backend_service.dart';
-import 'package:drp/main.dart';
+import 'package:drp/data_types/comment.dart';
 import 'package:drp/data_types/my_post.dart';
+import 'package:drp/main.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/widgets/comment_widget.dart';
 
 class PhotoModal extends StatefulWidget {
   const PhotoModal({super.key, required this.post});
-  final Post post;
+  final MyPost post;
 
   @override
   PhotoModalState createState() => PhotoModalState();
@@ -17,32 +18,18 @@ class PhotoModalState extends State<PhotoModal> {
   final TextEditingController _controller = TextEditingController();
   List<CommentWidget> comments = [];
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Future<CommentWidget> _buildPostComment() async {
-    final String? username = await BackEndService.fetchNameFromUUID(widget.post.authorID!);
-    return CommentWidget(caption: widget.post.caption!, dateTime: widget.post.postTime!, user: username!);
-  }
-
-  List<CommentWidget> _dummyComments() {
-    return [
-      CommentWidget(caption: "where is this?", dateTime: DateTime.now(), user: "me"),
-      CommentWidget(caption: "we went xxx today, it was qwertyuiopasdfghjklzxcvbnm", dateTime: DateTime.now(), user: "Dad"),
-    ];
-  }
-
   void _addComment() {
     final value = _controller.text.trim();
     if (value.isNotEmpty) {
       setState(() {
-        comments.add(CommentWidget(
-          caption: value,
-          dateTime: DateTime.now(),
-          user: "me",
-        ));
+        BackEndService.addCommentToChatID(
+          Comment(
+            authorID: BackEndService.userID!,
+            postTime: DateTime.now(),
+            message: value
+          ), 
+          widget.post.chatID!
+        );
         _controller.clear(); // Clear the text field after submission
       });
     }
@@ -71,6 +58,7 @@ class PhotoModalState extends State<PhotoModal> {
                 child: FutureBuilder(
                   future: BackEndService.fetchImageFromCloudByID(widget.post.imageIDs![0]), 
                   builder: (context, snapshot) {
+                    print("in photo modal buildre");
                     if (!snapshot.hasData) {
                       return Text("Loading image...");
                     } else {
@@ -84,26 +72,38 @@ class PhotoModalState extends State<PhotoModal> {
             Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
-                // This will require stream builder
-                child: FutureBuilder(
-                  future: _buildPostComment(), 
+                child: StreamBuilder(
+                  stream: BackEndService.getAllCommentSnapshotsFromChat(widget.post.chatID!), 
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) { return Text("Loading comments..."); }
+                    print("in builder");
+                    if (snapshot.hasData) {
+                      print("snapshot has data");
+                      comments.clear();
+                      for (final doc in snapshot.data!.docs) {
+                        print("doc $doc");
+                        comments.add(CommentWidget(comment: Comment.fromFirestore(doc, null)));
+                        print("comments length = ${comments.length}");
+                      }
 
-                    comments.add(snapshot.data!);
-                    
-                    // Dummy comments
-                    if (testMode) { 
-                      comments.addAll(_dummyComments()); 
+                      comments.sort((a, b) => (a.comment.postTime!.compareTo(b.comment.postTime!)));
+
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: comments.length,
+                        itemBuilder: (context, index) {
+                          return comments[index];
+                        }
+                      );
+
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 1,
+                        itemBuilder: (_, _) {
+                          return Text("Loading comments...");
+                        }
+                      );
                     }
-
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: comments.length,
-                      itemBuilder: (context, index) {
-                        return comments[index];
-                      },
-                    );
                   }
                 )
               ),
