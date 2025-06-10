@@ -87,12 +87,13 @@ class _MyHomePageState extends State<MyHomePage> {
         await fileRef.putData(bytes);
 
         // Reject image if meta data can't be read
-        if (await exif.getOriginalDate() == null) {
+        final originalDate = await exif.getOriginalDate();
+        if (originalDate == null) {
           throw Exception("Can not read meta data in image, only images taken from phone camera may be uploaded.");
         }
 
         // Upload image data
-        MyImage newImg = MyImage(ownerID: BackEndService.userID, creationTime: await exif.getOriginalDate());
+        MyImage newImg = MyImage(ownerID: BackEndService.userID, creationTime: originalDate);
         await dbRef.collection("Group_Data").doc(userData!.groupID!).collection("Images").doc(imgID).set(
           newImg.toFirestore()
         );
@@ -106,7 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
           chatID: chatID,
           caption: caption, 
           tag: tag,
-          postTime: DateTime.now()
+          postTime: DateTime.now(),
+          timeFirstImageTaken: originalDate
         );
         Comment initialComment = Comment(
           authorID: BackEndService.userID,
@@ -265,13 +267,13 @@ class _MyHomePageState extends State<MyHomePage> {
           print("At stream builder");
           if (snapshot.hasData) {
             photos.clear();
-            for (final doc in snapshot.data!.docs) {
+            for (final doc in snapshot.data!.docs) {              
               GlobalKey<TimelineNodeWidgetState> key = GlobalKey<TimelineNodeWidgetState>();
               photos.add(TimelineNodeWidget(key: key, post: MyPost.fromFirestore(doc, null)));
               photoKeys.add(key);
             }
 
-            photos.sort((a, b) => (a.post.postTime!.compareTo(b.post.postTime!)));
+            photos.sort((a, b) => (a.post.timeFirstImageTaken!.compareTo(b.post.timeFirstImageTaken!)));
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,

@@ -5,10 +5,11 @@ class MyPost {
   List? imageIDs;
   String? chatID;
   DateTime? postTime;
+  DateTime? timeFirstImageTaken;
   String? caption;
   String? tag;
 
-  MyPost({this.authorID, this.imageIDs, this.chatID, this.postTime, this.caption, this.tag});
+  MyPost({this.authorID, this.imageIDs, this.chatID, this.postTime, this.timeFirstImageTaken, this.caption, this.tag});
 
   factory MyPost.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -20,6 +21,7 @@ class MyPost {
       imageIDs: data?['imageIDs'],
       chatID: data?['chatID'],
       postTime: DateTime.fromMillisecondsSinceEpoch(data?['postTime']),
+      timeFirstImageTaken: DateTime.fromMillisecondsSinceEpoch(data?['timeFirstImageTaken'] ?? data?['postTime']),
       caption: data?['caption'],
       tag: data?['tag'],
     );
@@ -31,6 +33,7 @@ class MyPost {
       if (imageIDs != null) "imageIDs": imageIDs,
       if (chatID != null) "chatID": chatID,
       if (postTime != null) "postTime": postTime!.millisecondsSinceEpoch,
+      if (timeFirstImageTaken != null) "timeFirstImageTaken": timeFirstImageTaken!.millisecondsSinceEpoch,
       if (caption != null) "caption": caption,
       if (tag != null) "tag": tag
     };

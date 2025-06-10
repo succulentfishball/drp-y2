@@ -17,20 +17,17 @@ class TimelineNodeWidget extends StatefulWidget {
 class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKeepAliveClientMixin {
   Widget buildPostWidget(MyPost post) {
     final Future<String?> authorDisplayNameFuture = BackEndService.fetchNameFromUUID(post.authorID!);
-    final Future<Uint8List?> imgDataFuture = BackEndService.fetchImageFromCloudByID(widget.post.imageIDs![0]);
-    final Future<MyImage?> imgFuture = BackEndService.fetchImageDataFromDB(post.imageIDs![0]);
-    final Future<DateTime?> creationTimeFuture = imgFuture.then((img) => img?.creationTime);
+    final Future<Uint8List?> imgDataFuture = BackEndService.fetchImageFromCloudByID(post.imageIDs![0]);
 
     return FutureBuilder<List<dynamic>>(
       future: Future.wait([
         authorDisplayNameFuture,
         imgDataFuture,
-        creationTimeFuture,
       ]),
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting && !snapshot.hasError && snapshot.hasData) {
           String authorDisplayName = snapshot.data![0] ?? '';
-          DateTime creationTime = snapshot.data![2] ?? DateTime.now();
+          DateTime creationTime = post.timeFirstImageTaken!;
 
           return Padding(
             padding: EdgeInsetsGeometry.fromLTRB(4, 8, 0, 8),
