@@ -56,27 +56,27 @@ class PostWidgetState extends State<PostWidget> {
           child: Column(
             children: [
               // details for user and time at the top
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Author pill
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.85),  // 85% opaque white
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    widget.authorDisplayName,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
-                      color: Colors.black87,             // ensure legibility
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Author pill
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.85),  // 85% opaque white
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      widget.authorDisplayName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+                        color: Colors.black87,             // ensure legibility
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
               // image with click detector if not posting
               Expanded(
                 child: Center(

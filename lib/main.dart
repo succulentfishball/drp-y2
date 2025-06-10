@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/widgets/timeline.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp/pages/login.dart';
@@ -71,8 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final storageRef = FirebaseStorage.instance.ref(); 
   final dbRef = FirebaseFirestore.instance;
 
+  // May break if exif can't read "creationTime" from file
   void uploadPhoto(XFile file, String caption, String? tag) async {
-    // String imageUrl = 'https://picsum.photos/250';
     // Get meta data and file data
     final exif = await Exif.fromPath(file.path);
     final bytes = await File(file.path).readAsBytes();
@@ -84,6 +85,11 @@ class _MyHomePageState extends State<MyHomePage> {
       // Upload image to Firebase Storage
       try {
         await fileRef.putData(bytes);
+
+        // Reject image if meta data can't be read
+        if (await exif.getOriginalDate() == null) {
+          throw Exception("Can not read meta data in image, only images taken from phone camera may be uploaded.");
+        }
 
         // Upload image data
         MyImage newImg = MyImage(ownerID: BackEndService.userID, creationTime: await exif.getOriginalDate());
@@ -122,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     } catch (e) {
       print(e);
-      Toaster().displayAuthToast("Error uploading post, please try again later.");
+      Toaster().displayAuthToast("Error: ${e.toString()}");
     }
   }
 

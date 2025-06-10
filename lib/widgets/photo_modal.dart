@@ -59,7 +59,6 @@ class PhotoModalState extends State<PhotoModal> {
                   child: FutureBuilder(
                     future: BackEndService.fetchImageFromCloudByID(widget.post.imageIDs![0]), 
                     builder: (context, snapshot) {
-                      print("in photo modal buildre");
                       if (!snapshot.hasData) {
                         return Text("Loading image...");
                       } else {
