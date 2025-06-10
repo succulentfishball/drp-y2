@@ -22,7 +22,8 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
     "Guess the price!",
     "This made me think of you...",
     "Postcards from home",
-    "Save for when we meet"
+    "Save for when we meet",
+    "Pets from home"
   ];
   bool _showTags = false;
   String? _selectedTag;
@@ -61,9 +62,24 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
     setState(() => _selectedTag = null);
   }
 
+  DecorationImage? _getFrameDecoration() {
+    if (_selectedTag == "Trying to Chef!") {
+      return const DecorationImage(
+        image: AssetImage("assets/photoframes/foodframe.png"),
+        fit: BoxFit.fill,
+      );
+    } else if (_selectedTag == "Pets from home") {
+      return const DecorationImage(
+        image: AssetImage("assets/photoframes/petframe.png"),
+        fit: BoxFit.fill,
+      );
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bool isChefTag = _selectedTag == "Trying to Chef!";
+    final bool hasCustomFrame = _selectedTag == "Trying to Chef!" || _selectedTag == "Pets from home";
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -79,17 +95,12 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
           ),
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 40, bottom: 180),
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
+              margin: const EdgeInsets.only(top: 40, bottom: 160),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
               decoration: BoxDecoration(
-                image: isChefTag
-                  ? DecorationImage(
-                      image: AssetImage("assets/photoframes/foodframe.png"),
-                      fit: BoxFit.fill,
-                    )
-                  : null,
-                color: isChefTag ? null : Colors.white,
-                border: isChefTag ? null : Border.all(color: Colors.grey.shade300, width: 2),
+                image: _getFrameDecoration(),
+                color: hasCustomFrame ? null : Colors.white,
+                border: hasCustomFrame ? null : Border.all(color: Colors.grey.shade300, width: 2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SizedBox(
