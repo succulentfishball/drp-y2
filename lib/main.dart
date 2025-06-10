@@ -99,6 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
           imageIDs: [imgID], 
           chatID: chatID,
           caption: caption, 
+          tag: tag,
           postTime: DateTime.now()
         );
         Comment initialComment = Comment(
