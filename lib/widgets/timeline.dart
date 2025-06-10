@@ -48,7 +48,11 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
             ),
           );
         } else {
-          return Text("Loading post...");
+          if (snapshot.hasError) {
+            return Text("Loading post... (${snapshot.error})");
+          } else {
+            return Text("Loading post... (no data)");
+          }
         }
       }
     );
