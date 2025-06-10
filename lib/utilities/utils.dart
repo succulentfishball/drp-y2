@@ -38,3 +38,7 @@ String date(DateTime dateTime) {
 String time(DateTime dateTime) {
   return DateFormat('jm').format(dateTime);
 }
+
+String dateAndTime(DateTime dateTime) {
+  return DateFormat('dd/MM/yy HHmm').format(dateTime);
+}

@@ -40,7 +40,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
                 fit: BoxFit.fitWidth,
               ),
               authorDisplayName: authorDisplayName,
-              creationDisplayTime: '${utils.date(creationTime)} ${utils.time(creationTime)}',
+              creationDisplayTime: utils.dateAndTime(creationTime),
               caption: widget.post.caption ?? '',
               tag: widget.post.tag ?? '',
               replyCount: 0,

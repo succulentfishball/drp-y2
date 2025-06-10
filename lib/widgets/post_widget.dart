@@ -75,21 +75,6 @@ class PostWidgetState extends State<PostWidget> {
                     ),
                   ),
                 ),
-                // Timestamp pill
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.85),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    widget.creationDisplayTime,
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
               ],
             ),
               // image with click detector if not posting
@@ -107,6 +92,18 @@ class PostWidgetState extends State<PostWidget> {
                           }
                         },
                         child: widget.image
+                      ),
+                      Positioned(
+                        bottom: 4,
+                        left: 4,
+                        child: Text(
+                          widget.creationDisplayTime,
+                          style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+                            fontFamily: 'monospace',
+                            color: Colors.amber,
+                          ),
+                        ),
                       ),
                       Positioned(
                         bottom: 4,
