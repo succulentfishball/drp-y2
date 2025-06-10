@@ -98,13 +98,13 @@ class _MyHomePageState extends State<MyHomePage> {
           authorID: BackEndService.userID, 
           imageIDs: [imgID], 
           chatID: chatID,
-          caption: "captions to be implemented", 
+          caption: caption, 
           postTime: DateTime.now()
         );
         Comment initialComment = Comment(
           authorID: BackEndService.userID,
           postTime: DateTime.now(),
-          message: "Messages to be implemented"
+          message: caption
         );
         await dbRef.collection("Group_Data").doc(userData!.groupID!).collection("Posts").doc(postID).set(
           newPost.toFirestore()
