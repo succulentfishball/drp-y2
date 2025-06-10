@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:drp/widgets/post_widget.dart';
 
 class PrePostPage extends StatefulWidget {
   final XFile imageFile;
@@ -93,28 +94,16 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
               ),
             ),
           ),
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 40, bottom: 160),
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
-              decoration: BoxDecoration(
-                image: _getFrameDecoration(),
-                color: hasCustomFrame ? null : Colors.white,
-                border: hasCustomFrame ? null : Border.all(color: Colors.grey.shade300, width: 2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.7,
-                height: MediaQuery.of(context).size.height * 0.45,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(
-                    File(widget.imageFile.path),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+          PostWidget(
+            image: Image.file(
+              File(widget.imageFile.path),
+              fit: BoxFit.cover,
             ),
+            authorDisplayName: 'me',
+            creationDisplayTime: 'now',
+            caption: _captionController.text,
+            tag: _selectedTag ?? '',
+            replyCount: 0
           ),
           Align(
             alignment: Alignment.bottomCenter,

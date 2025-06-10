@@ -1,15 +1,17 @@
-import 'package:drp/backend_services/backend_service.dart';
 import 'package:flutter/material.dart';
-import 'package:drp/utilities/utils.dart' as utils;
+import 'package:drp/widgets/photo_modal.dart';
+import 'package:drp/data_types/my_post.dart';
 
 class PostWidget extends StatefulWidget {
-  const PostWidget({super.key, required this.image, required this.authorDisplayName, required this.creationDisplayTime, required this.caption, required this.tag, required this.replyCount});
+  const PostWidget({super.key, required this.image, required this.authorDisplayName, required this.creationDisplayTime, required this.caption, required this.tag, required this.replyCount, this.post});
   final Widget image;
   final String authorDisplayName;
   final String creationDisplayTime;
   final String caption;
   final String tag;
   final int replyCount;
+  // post will only exist if it is part of the timeline
+  final Post? post;
 
   @override
   PostWidgetState createState() => PostWidgetState();
@@ -38,8 +40,7 @@ class PostWidgetState extends State<PostWidget> {
       child: AspectRatio(
         aspectRatio: 3 / 4,
         child: Container(
-          // margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           decoration: BoxDecoration(
             image: _getFrameDecoration(),
             color: hasCustomFrame ? null : Colors.white,
@@ -66,14 +67,24 @@ class PostWidgetState extends State<PostWidget> {
                   ),
                   SizedBox(height: 12),
                   // image with click detector if not posting
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    height: MediaQuery.of(context).size.width * 0.8 * 4 / 3,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: widget.image,
+                  GestureDetector(
+                    onTap: () {
+                      if (widget.post != null) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => PhotoModal(post: widget.post!),
+                        );
+                      }
+                    },
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      height: MediaQuery.of(context).size.width * 0.8 * 4 / 3,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: FittedBox(
+                          fit: BoxFit.cover,
+                          child: widget.image,
+                        ),
                       ),
                     ),
                   ),
