@@ -67,18 +67,34 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.file(
-              File(widget.imageFile.path),
-              fit: BoxFit.cover,
-            ),
-          ),
           SafeArea(
             child: Align(
               alignment: Alignment.topLeft,
               child: IconButton(
                 icon: const Icon(Icons.close, color: Colors.white),
                 onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ),
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 40, bottom: 180),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 72), // thicker bottom border
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey.shade300, width: 2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: MediaQuery.of(context).size.height * 0.45,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    File(widget.imageFile.path),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
           ),
@@ -97,7 +113,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                         height: 300,
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withOpacity(0.75), // more opaque
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListView(
