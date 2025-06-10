@@ -85,6 +85,14 @@ class BackEndService {
 
   static String? getGroupID() { return groupID; }
 
+  static Future<void> addCommentToChatID(Comment comment, String chatID) async {
+    await dbRef.collection("Group_Data").doc(groupID!)
+               .collection("Chat").doc(chatID)
+               .collection("Messages").doc(Uuid().v1()).set(
+                comment.toFirestore()
+               );
+  } 
+
   static Future<void> setUserData(String uid) async {
     final randomGroupID = Uuid().v1();
     await dbRef.collection("Users").doc(uid).set({

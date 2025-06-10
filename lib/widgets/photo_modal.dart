@@ -21,7 +21,14 @@ class PhotoModalState extends State<PhotoModal> {
     final value = _controller.text.trim();
     if (value.isNotEmpty) {
       setState(() {
-        // Send comment to database
+        BackEndService.addCommentToChatID(
+          Comment(
+            authorID: BackEndService.userID!,
+            postTime: DateTime.now(),
+            message: value
+          ), 
+          widget.post.chatID!
+        );
         _controller.clear(); // Clear the text field after submission
       });
     }
