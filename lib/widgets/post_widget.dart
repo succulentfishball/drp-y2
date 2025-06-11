@@ -159,7 +159,7 @@ class PostWidgetState extends State<PostWidget> {
                         child: Container(
                           padding: EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
+                            color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(180),
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           child: widget.post != null ? StreamBuilder(
@@ -171,13 +171,22 @@ class PostWidgetState extends State<PostWidget> {
                                   return Text("... replies");
                                 } else {
                                   final x = snapshot.data!;
-                                  return Text(
-                                    "$x ${x != 1 ? "replies" : "reply"}",
-                                    style: TextStyle(
-                                      letterSpacing: -0.5,
-                                      fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-                                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                    ),
+                                  return Row(
+                                    children: [
+                                      Text("$x",
+                                        style: TextStyle(
+                                          fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                        ),
+                                      ),
+                                      SizedBox(width: 4),
+                                      Icon(
+                                        Icons.comment,
+                                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                        size: 16,
+                                      ),
+                                    ]
                                   );
                                 }
                               },

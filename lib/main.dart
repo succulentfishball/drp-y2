@@ -260,8 +260,8 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         title: Text(utils.date(DateTime.now())),
         leading: IconButton(
-          icon: const Icon(Icons.filter_list),
-          tooltip: 'Filter Settings',
+          icon: const Icon(Icons.search),
+          tooltip: 'Search',
           onPressed: () {},
         ),
         actions: [
