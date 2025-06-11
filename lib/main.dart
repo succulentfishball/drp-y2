@@ -275,13 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
             photos.sort((a, b) => (a.post.timeFirstImageTaken!.compareTo(b.post.timeFirstImageTaken!)));
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(child: TimelineWidget(photos: photos, photoKeys: photoKeys)),
-              ]
-            );
+            return Expanded(child: TimelineWidget(photos: photos, photoKeys: photoKeys));
           } else {
             return Text("No data for home page");
           }

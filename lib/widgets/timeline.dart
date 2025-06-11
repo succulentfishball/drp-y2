@@ -194,18 +194,35 @@ class TimelineWidgetState extends State<TimelineWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: ListView.builder(
-        // controller: _scrollController,
-        itemCount: widget.photos.length,
-        itemBuilder: (context, index) {
-          return TimelineNodeWidget(
-              key: widget.photoKeys[index],
-              post: widget.photos[index].post
+    return Expanded(
+      // background colour to fill up space if there is not enough post
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/chatbackground/paper.jpg'),
+            repeat: ImageRepeat.repeat,
+          ),
+        ),
+        child: ListView.builder(
+          // controller: _scrollController,
+          itemCount: widget.photos.length,
+          itemBuilder: (context, index) {
+            // background for each post
+            return Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/chatbackground/paper.jpg'),
+                  repeat: ImageRepeat.repeat,
+                ),
+              ),
+              child: TimelineNodeWidget(
+                key: widget.photoKeys[index],
+                post: widget.photos[index].post
+              )
             );
-        },
-      )
+          },
+        ),
+      ),
     );
   }
 }
