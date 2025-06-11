@@ -85,6 +85,14 @@ class PostWidgetState extends State<PostWidget> {
             color: hasCustomFrame ? null : Colors.grey.shade100,
             border: hasCustomFrame ? Border.all(color: Colors.black, width: 2) : Border.all(color: Colors.grey.shade300, width: 2),
             borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                spreadRadius: 4,
+                blurRadius: 3,
+                offset: Offset(3, 3), // changes position of shadow
+              ),
+            ],
           ),
           child: Column(
             children: [

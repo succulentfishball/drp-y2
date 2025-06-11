@@ -216,7 +216,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
                   reverse: true,
                   controller: scrollController,
                   itemCount: filteredPhotos.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => const SizedBox(height: 16),
                   itemBuilder: (context, id) {
                     final idx = filteredPhotos.length - id - 1;
                     final post = filteredPhotos[idx].post;
