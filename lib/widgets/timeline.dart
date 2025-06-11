@@ -220,7 +220,7 @@ return Column(
         // Filter tabs molded into page (Chrome-style)
         // Tabs sit directly on the page background
           Container(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.primaryContainer,
             child: SizedBox(
               height: 38, // just enough to contain the pills
               child: SingleChildScrollView(
@@ -229,7 +229,7 @@ return Column(
                 child: Row(
                   children: List.generate(_pagesTags.length, (i) {
                     final tag = _pagesTags[i];
-                    final label = tag == null ? 'All' : tag;
+                    final label = tag ?? 'All';
                     final isSelected = _selectedTag == tag;
                     return Padding(
                       padding: const EdgeInsets.only(right: 4),
@@ -238,7 +238,7 @@ return Column(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: isSelected ? Color(0xFFC1B39B) : Colors.grey.shade200,
+                            color: isSelected ? Color(0xFFC1B39B) : Theme.of(context).colorScheme.surfaceContainer,
                             borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
                               topRight: Radius.circular(12),
@@ -247,16 +247,16 @@ return Column(
                             ),
                             border: Border(
                               top: BorderSide(
-                                color: isSelected ? Colors.brown.shade700 : Colors.grey.shade300,
-                                width: isSelected ? 2 : 1,
+                                color: Theme.of(context).colorScheme.outlineVariant,
+                                width: 1,
                               ),
                               left: BorderSide(
-                                color: isSelected ? Colors.brown.shade700 : Colors.grey.shade300,
-                                width: isSelected ? 2 : 1,
+                                color: Theme.of(context).colorScheme.outlineVariant,
+                                width: 1,
                               ),
                               right: BorderSide(
-                                color: isSelected ? Colors.brown.shade700 : Colors.grey.shade300,
-                                width: isSelected ? 2 : 1,
+                                color: Theme.of(context).colorScheme.outlineVariant,
+                                width: 1,
                               ),
                             ),
                           ),

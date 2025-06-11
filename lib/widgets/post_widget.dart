@@ -53,7 +53,7 @@ class PostWidgetState extends State<PostWidget> {
           padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
           decoration: BoxDecoration(
             image: _getFrameDecoration(),
-            color: hasCustomFrame ? null : Colors.white,
+            color: hasCustomFrame ? null : Colors.grey.shade100,
             border: hasCustomFrame ? Border.all(color: Colors.black, width: 2) : Border.all(color: Colors.grey.shade300, width: 2),
             borderRadius: BorderRadius.circular(16),
           ),

@@ -63,30 +63,9 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
     setState(() => _selectedTag = null);
   }
 
-  DecorationImage? _getFrameDecoration() {
-    if (_selectedTag == "Trying to Chef!") {
-      return const DecorationImage(
-        image: AssetImage("assets/photoframes/foodframe.png"),
-        fit: BoxFit.fill,
-      );
-    } else if (_selectedTag == "Pets from home") {
-      return const DecorationImage(
-        image: AssetImage("assets/photoframes/petframe.png"),
-        fit: BoxFit.fill,
-      );
-    } else if (_selectedTag == "Postcards from home") {
-      return const DecorationImage(
-        image: AssetImage("assets/photoframes/postcardframe.png"),
-        fit: BoxFit.fill,
-      );
-    }
-    return null;
-  }
-
   @override
   // Careful about using null checker on widget.post
   Widget build(BuildContext context) {
-    final bool hasCustomFrame = _selectedTag == "Trying to Chef!" || _selectedTag == "Pets from home" || _selectedTag == "Postcards from home";
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(

@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'DRP',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
@@ -256,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget getMainInterface() {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         centerTitle: true,
         title: Text(utils.date(DateTime.now())),
         leading: IconButton(
