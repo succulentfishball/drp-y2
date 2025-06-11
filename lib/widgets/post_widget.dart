@@ -88,7 +88,10 @@ class PostWidgetState extends State<PostWidget> {
                           if (widget.post != null) {
                             showDialog(
                               context: context,
-                              builder: (context) => PhotoModal(post: widget.post!),
+                              builder: (context) {
+                                BackEndService.incrementPostsOpened();
+                                return PhotoModal(post: widget.post!);
+                              },
                             );
                           }
                         },
@@ -115,25 +118,27 @@ class PostWidgetState extends State<PostWidget> {
                             color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
                             borderRadius: BorderRadius.circular(16.0),
                           ),
-                          child: FutureBuilder(
-                            future: BackEndService.getNumberOfRepliesToPost(widget.post),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) {
-                                return Text("... replies");
-                              } else {
-                                final x = snapshot.data!;
-                                return Text(
-                                  // todo replies
-                                  "$x ${x != 1 ? "replies" : "reply"}",
-                                  style: TextStyle(
-                                    fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-                                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                  ),
-                                );
-                              }
-                            },
-                          ) 
-                        ),
+                          child: widget.post != null ? StreamBuilder(
+                            stream: BackEndService.getAllCommentSnapshotsFromChat(widget.post!.chatID), 
+                            builder: (_, _) => FutureBuilder(
+                              future: BackEndService.getNumberOfRepliesToPost(widget.post!.chatID!),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Text("... replies");
+                                } else {
+                                  final x = snapshot.data!;
+                                  return Text(
+                                    "$x ${x != 1 ? "replies" : "reply"}",
+                                    style: TextStyle(
+                                      fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                    ),
+                                  );
+                                }
+                              },
+                            ) 
+                          ) : Text("0 replies")
+                        )
                       ),
                     ]
                   ),

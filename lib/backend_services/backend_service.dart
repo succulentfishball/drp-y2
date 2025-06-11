@@ -2,9 +2,11 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp/data_types/comment.dart';
 import 'package:drp/data_types/my_image.dart';
-import 'package:drp/main.dart';
+import 'package:drp/data_types/my_post_record.dart';
 import 'package:drp/data_types/my_post.dart';
+import 'package:drp/utilities/global_vars.dart';
 import 'package:drp/utilities/toaster.dart' show Toaster;
+import 'package:drp/utilities/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
@@ -116,4 +118,43 @@ class BackEndService {
   static clearUserData() {
     userID = null; groupID = null;
   }
+
+  // Quantitative analysis
+  static Future<void> incrementTotalPosts() async { await incrementQuantitativeField("totalPosts"); }
+
+  static Future<void> incrementTotalComments() async { await incrementQuantitativeField("totalComments"); }
+
+  static Future<void> incrementPostsOpened() async { await incrementQuantitativeField("postsOpened"); }
+
+  static Future<void> incrementTagsUsed() async { await incrementQuantitativeField("tagsUsed"); }
+
+  static Future<void> incrementQuantitativeField(String field) async {
+    final ref = dbRef.doc('Group_Data/$groupID/Quantitative_Data/${reverseDateFormat(DateTime.now())}');
+    final snapshot = await ref.get();
+    final value = snapshot.data()?[field];
+    if (value != null) {
+      ref.update({field: value + 1});
+    } else {
+      Map<String, dynamic> m = snapshot.data() ?? {};
+      m.addEntries({field: 1}.entries);
+      ref.set(m);
+    }
+  }
+
+  static Future<void> addToPostsHistory(MyPostRecord record) async { await addRecordToHistory(record, "postHistory"); }
+
+  static Future<void> addRecordToHistory(dynamic record, String field) async {
+    final ref = dbRef.doc('Group_Data/$groupID/Quantitative_Data/${reverseDateFormat(DateTime.now())}');
+    final snapshot = await ref.get();
+    final List<dynamic>? value = snapshot.data()?[field];
+    print(record.toString());
+    if (value != null) {
+      value.add(record.toFirestore());
+      ref.update({field: value});
+    } else {
+      Map<String, dynamic> m = snapshot.data() ?? {};
+      m[field] = [record.toFirestore()];
+      ref.set(m);
+    }
+  } 
 }

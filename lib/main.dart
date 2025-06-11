@@ -1,13 +1,15 @@
 import 'dart:io';
 import 'package:drp/backend_services/backend_service.dart';
 import 'package:drp/data_types/comment.dart';
+import 'package:drp/data_types/enums.dart';
+import 'package:drp/data_types/my_post_record.dart';
+import 'package:drp/utilities/global_vars.dart' as global_vars;
 import 'package:drp/utilities/toaster.dart';
 import 'package:drp/utilities/utils.dart' as utils;
 import 'package:firebase_auth/firebase_auth.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/widgets/timeline.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp/pages/login.dart';
@@ -22,8 +24,6 @@ import 'package:drp/data_types/my_post.dart';
 import 'package:drp/data_types/my_image.dart';
 import 'package:drp/pages/pre_post.dart';
 
-const bool testMode = false;
-const String dummyGroupID = "9366e9b0-415b-11f0-bf9f-b5479dd77560";
 MyUser? userData;
 
 void main() async {
@@ -74,6 +74,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // May break if exif can't read "creationTime" from file
   void uploadPhoto(XFile file, String caption, String? tag) async {
+    BackEndService.incrementTotalPosts();
+    if (tag != null) { 
+      BackEndService.incrementTagsUsed();
+    }
+
     // Get meta data and file data
     final exif = await Exif.fromPath(file.path);
     final bytes = await File(file.path).readAsBytes();
@@ -122,7 +127,17 @@ class _MyHomePageState extends State<MyHomePage> {
           initialComment.toFirestore()
         );
 
-        setState(() {});
+        setState(() {
+          BackEndService.addToPostsHistory(MyPostRecord(
+            authorID: BackEndService.userID,
+            method: global_vars.currentPostingMethod,
+            uploadTime: DateTime.now(),
+            postWritingDuration: DateTime.now().difference(global_vars.startingPostTime!),
+            tag: tag
+          ));
+          global_vars.startingPostTime = null;
+          global_vars.currentPostingMethod = null;
+        });
 
       } on firebase_core.FirebaseException catch (e) {
         print(e);
@@ -135,6 +150,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> takePhoto() async {
+    global_vars.startingPostTime = DateTime.now();
+    global_vars.currentPostingMethod = Method.camera;
+
     final XFile? photo = await picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       Navigator.push(
@@ -171,6 +189,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> pickPhoto() async {
+    global_vars.startingPostTime = DateTime.now();
+    global_vars.currentPostingMethod = Method.gallery;
+
     final XFile? photo = await picker.pickImage(source: ImageSource.gallery, imageQuality: 5);
     if (photo != null) {
       Navigator.push(
