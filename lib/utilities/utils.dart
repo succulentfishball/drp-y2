@@ -35,6 +35,14 @@ String date(DateTime dateTime) {
   }
 }
 
+String dateFormat(DateTime dateTime) {
+  return DateFormat('dd/MM/yyyy').format(dateTime);
+}
+
+String reverseDateFormat(DateTime dateTime) {
+  return DateFormat('yyyy/MM/dd').format(dateTime);
+}
+
 String time(DateTime dateTime) {
   return DateFormat('jm').format(dateTime);
 }

@@ -6,6 +6,7 @@ import 'package:drp/main.dart';
 import 'package:drp/data_types/my_post.dart';
 import 'package:drp/utilities/global_vars.dart';
 import 'package:drp/utilities/toaster.dart' show Toaster;
+import 'package:drp/utilities/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
@@ -112,5 +113,23 @@ class BackEndService {
 
   static clearUserData() {
     userID = null; groupID = null;
+  }
+
+  // Quantitative analysis
+  static Future<void> incrementTotalPosts() async { await incrementQuantitativeField("totalPosts"); }
+
+  static Future<void> incrementQuantitativeField(String field) async {
+    final ref = dbRef.doc('Group_Data/$groupID/Quantitative_Data/${reverseDateFormat(DateTime.now())}');
+    final snapshot = await ref.get();
+    final value = snapshot.data()?[field];
+    if (value != null) {
+      print("trying to update value: $value");
+      ref.update({field: value + 1});
+    } else {
+      Map<String, dynamic> m = snapshot.data() ?? {};
+      m.addEntries({field: 1}.entries);
+      print("About to set ${m.entries}");
+      ref.set(m);
+    }
   }
 }
