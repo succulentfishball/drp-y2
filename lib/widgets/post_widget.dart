@@ -121,7 +121,7 @@ class PostWidgetState extends State<PostWidget> {
                           child: widget.post != null ? StreamBuilder(
                             stream: BackEndService.getAllCommentSnapshotsFromChat(widget.post!.chatID), 
                             builder: (_, _) => FutureBuilder(
-                              future: BackEndService.getNumberOfRepliesToPost(widget.post!.chatID!),
+                              future: BackEndService.getNumberOfRepliesToPost(widget.post),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
                                   return Text("... replies");
