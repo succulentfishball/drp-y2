@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 import 'package:drp/backend_services/backend_service.dart';
-import 'package:drp/data_types/my_image.dart';
 import 'package:drp/data_types/my_post.dart';
 import 'package:drp/widgets/post_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/utilities/utils.dart' as utils;
+import 'dart:math';
 
 class TimelineNodeWidget extends StatefulWidget {
   final MyPost post;
@@ -29,9 +29,7 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
           String authorDisplayName = snapshot.data![0] ?? '';
           DateTime creationTime = post.timeFirstImageTaken!;
 
-          return Padding(
-            padding: EdgeInsetsGeometry.fromLTRB(4, 8, 0, 8),
-            child: PostWidget(
+          return PostWidget(
               image: Image.memory(
                 snapshot.data![1],
                 fit: BoxFit.fitWidth,
@@ -42,7 +40,6 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
               tag: widget.post.tag ?? '',
               replyCount: 0,
               post: widget.post,
-            ),
           );
         } else {
           if (snapshot.hasError) {
@@ -59,65 +56,90 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
   Widget build(BuildContext context) {
     super.build(context);
 
-    return 
-    IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // timeline vertical line
-                Expanded(
-                  child: Container(
-                    height: 10,
-                    width: 6,
-                    color: Theme.of(context).colorScheme.surfaceTint,
-                  ),
-                ),
-                // profile picture
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).colorScheme.surfaceContainer
-                  ),
-                  child: Icon(
-                    Icons.person,
-                    size: 32,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant
-                  ),
-                ),
-                // timeline vertical line
-                Expanded(
-                  child: Container(
-                    width: 6,
-                    color: Theme.of(context).colorScheme.surfaceTint,
-                  ),
-                ),
-              ],
-            ),
-            // timeline horizontal line
-            Column(
-              children: [
-                Spacer(),
-                Container(
-                  width: 32,
-                  height: 4,
-                  color: Theme.of(context).colorScheme.surfaceTint,
-                  margin: EdgeInsets.symmetric(horizontal: 8),
-                ),
-                Spacer(),
-              ],
-            ),
-            // actual post container
-            Expanded(
+    var isMyPost = BackEndService.userID == widget.post.authorID;
+
+    const maxRot = 6;
+    const maxShift = 24;
+
+    final random = Random();
+    double rotationAngle = (random.nextDouble() * 2 * maxRot - maxRot) * (pi / 180);
+    // shift towards center only
+    double shiftX = (isMyPost ? -1 : 1) * random.nextDouble() * maxShift;
+
+    return Row(
+      mainAxisAlignment: isMyPost ? MainAxisAlignment.end : MainAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.6,
+          child: Transform.translate(
+            offset: Offset(shiftX, 0),
+            child: Transform.rotate(
+              angle: rotationAngle,
               child: buildPostWidget(widget.post),
             ),
-          ]
-      ),
+          ),
+        ),
+      ]
     );
+
+    // IntrinsicHeight(
+    //   child: Row(
+    //     crossAxisAlignment: CrossAxisAlignment.stretch,
+    //       children: [
+    //         Column(
+    //           mainAxisSize: MainAxisSize.min,
+    //           children: [
+    //             // timeline vertical line
+    //             Expanded(
+    //               child: Container(
+    //                 height: 10,
+    //                 width: 6,
+    //                 color: Theme.of(context).colorScheme.surfaceTint,
+    //               ),
+    //             ),
+    //             // profile picture
+    //             Container(
+    //               width: 64,
+    //               height: 64,
+    //               decoration: BoxDecoration(
+    //                 shape: BoxShape.circle,
+    //                 color: Theme.of(context).colorScheme.surfaceContainer
+    //               ),
+    //               child: Icon(
+    //                 Icons.person,
+    //                 size: 32,
+    //                 color: Theme.of(context).colorScheme.onSurfaceVariant
+    //               ),
+    //             ),
+    //             // timeline vertical line
+    //             Expanded(
+    //               child: Container(
+    //                 width: 6,
+    //                 color: Theme.of(context).colorScheme.surfaceTint,
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //         // timeline horizontal line
+    //         Column(
+    //           children: [
+    //             Spacer(),
+    //             Container(
+    //               width: 32,
+    //               height: 4,
+    //               color: Theme.of(context).colorScheme.surfaceTint,
+    //               margin: EdgeInsets.symmetric(horizontal: 8),
+    //             ),
+    //             Spacer(),
+    //           ],
+    //         ),
+    //         // actual post container
+    //         Expanded(
+    //           child: buildPostWidget(widget.post),
+    //         ),
+    //       ]
+    //   ),
+    // );
   }
 
   @override
