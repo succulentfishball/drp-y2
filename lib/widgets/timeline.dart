@@ -58,28 +58,31 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
 
     var isMyPost = BackEndService.userID == widget.post.authorID;
 
-    const maxRot = 6;
-    const maxShift = 24;
+    const maxRot = 4;
+    const maxShift = 20;
 
     final random = Random();
     double rotationAngle = (random.nextDouble() * 2 * maxRot - maxRot) * (pi / 180);
     // shift towards center only
     double shiftX = (isMyPost ? -1 : 1) * random.nextDouble() * maxShift;
 
-    return Row(
-      mainAxisAlignment: isMyPost ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.6,
-          child: Transform.translate(
-            offset: Offset(shiftX, 0),
-            child: Transform.rotate(
-              angle: rotationAngle,
-              child: buildPostWidget(widget.post),
+    return Padding(
+      padding: EdgeInsetsGeometry.all(4),
+      child: Row(
+        mainAxisAlignment: isMyPost ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.6,
+            child: Transform.translate(
+              offset: Offset(shiftX, 0),
+              child: Transform.rotate(
+                angle: rotationAngle,
+                child: buildPostWidget(widget.post),
+              ),
             ),
           ),
-        ),
-      ]
+        ]
+      ),
     );
 
     // IntrinsicHeight(
