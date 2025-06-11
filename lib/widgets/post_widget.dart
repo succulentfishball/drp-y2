@@ -40,6 +40,35 @@ class PostWidgetState extends State<PostWidget> {
     return null;
   }
 
+  Widget _getTagPill() {
+    Color tagColor;
+    if (widget.tag == "Trying to Chef!") {
+      tagColor = Colors.amber.shade300;
+    } else if (widget.tag == "Pets from home") {
+      tagColor = Colors.redAccent.shade100;
+    } else if (widget.tag == "Postcards from home") {
+      tagColor = Colors.deepPurple.shade200;
+    } else {
+      tagColor = Colors.white;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: tagColor.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        widget.tag,
+        style: TextStyle(
+          letterSpacing: -1,
+          fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+          color: Colors.black87,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool hasCustomFrame = widget.tag == "Trying to Chef!" || widget.tag == "Pets from home" || widget.tag == "Postcards from home";
@@ -82,21 +111,7 @@ class PostWidgetState extends State<PostWidget> {
                   Spacer(),
                   // Tag pill
                   if (widget.tag.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.85),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        widget.tag,
-                        style: TextStyle(
-                          letterSpacing: -1,
-                          fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
+                    _getTagPill(),
                 ],
               ),
               // image with click detector if not posting
@@ -159,6 +174,7 @@ class PostWidgetState extends State<PostWidget> {
                                   return Text(
                                     "$x ${x != 1 ? "replies" : "reply"}",
                                     style: TextStyle(
+                                      letterSpacing: -0.5,
                                       fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
                                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                                     ),
