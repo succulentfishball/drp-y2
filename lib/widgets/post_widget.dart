@@ -171,14 +171,13 @@ class PostWidgetState extends State<PostWidget> {
           ),
         ),
         Positioned(
-          top: -10,
+          top: -24,
           left: 0,
           right: 0,
-          child: Center(
-                    child: Icon(
-                      Icons.push_pin,
-                      color: Colors.red,
-                      size: 38,)
+          child: Image.asset(
+                    'assets/icons/push-pin.png',
+                    width: 48,
+                    height: 48,
                   ),
         ),
       ],

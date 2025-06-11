@@ -80,6 +80,7 @@ flutter:
     - assets/photoframes/postcardframe.png
     - assets/chatbackground/paper.jpg
     - assets/chatbackground/binder.png
+    - assets/icons/push-pin.png
 
 
   # To add custom fonts to your application, add a fonts section here,
