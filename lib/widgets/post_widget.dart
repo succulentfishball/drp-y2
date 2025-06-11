@@ -1,3 +1,4 @@
+import 'package:drp/backend_services/backend_service.dart';
 import 'package:drp/data_types/my_post.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/widgets/photo_modal.dart';
@@ -114,14 +115,24 @@ class PostWidgetState extends State<PostWidget> {
                             color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(200),
                             borderRadius: BorderRadius.circular(16.0),
                           ),
-                          child: Text(
-                            // todo replies
-                            "${widget.replyCount} Replies",
-                            style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-                              color: Theme.of(context).colorScheme.onSecondaryContainer,
-                            ),
-                          ),
+                          child: FutureBuilder(
+                            future: BackEndService.getNumberOfRepliesToPost(widget.post!.chatID!),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Text("... replies");
+                              } else {
+                                final x = snapshot.data!;
+                                return Text(
+                                  // todo replies
+                                  "$x ${x != 1 ? "replies" : "reply"}",
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                  ),
+                                );
+                              }
+                            },
+                          ) 
                         ),
                       ),
                     ]
