@@ -65,9 +65,9 @@ class PostWidgetState extends State<PostWidget> {
                 children: [
                   // Author pill
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.85),  // 85% opaque white
+                      color: Colors.white.withOpacity(0.85),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -75,10 +75,28 @@ class PostWidgetState extends State<PostWidget> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
-                        color: Colors.black87,             // ensure legibility
+                        color: Colors.black87,
                       ),
                     ),
                   ),
+                  Spacer(),
+                  // Tag pill
+                  if (widget.tag.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.85),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        widget.tag,
+                        style: TextStyle(
+                          letterSpacing: -1,
+                          fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
                 ],
               ),
               // image with click detector if not posting
@@ -106,9 +124,17 @@ class PostWidgetState extends State<PostWidget> {
                         child: Text(
                           widget.creationDisplayTime,
                           style: TextStyle(
+                            letterSpacing: -0.5,
                             fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
                             fontFamily: 'monospace',
                             color: Colors.amber,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                blurRadius: 4.0,
+                                color: Colors.black54,
+                              ),
+                            ],
                           ),
                         ),
                       ),
