@@ -290,8 +290,8 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: SpeedDial(
         marginEnd: 32 + 8,
         marginBottom: 8,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         icon: Icons.add,
         activeIcon: Icons.remove,
         overlayOpacity: 0.0,
