@@ -49,13 +49,13 @@ class PostWidgetState extends State<PostWidget> {
     } else if (widget.tag == "Postcards from home") {
       tagColor = Colors.deepPurple.shade200;
     } else {
-      tagColor = Colors.white;
+      tagColor = Colors.white.withOpacity(0.8);
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
-        color: tagColor.withOpacity(0.8),
+        color: tagColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
