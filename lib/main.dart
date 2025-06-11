@@ -22,8 +22,6 @@ import 'package:drp/data_types/my_post.dart';
 import 'package:drp/data_types/my_image.dart';
 import 'package:drp/pages/pre_post.dart';
 
-const bool testMode = false;
-const String dummyGroupID = "9366e9b0-415b-11f0-bf9f-b5479dd77560";
 MyUser? userData;
 
 void main() async {
