@@ -88,7 +88,10 @@ class PostWidgetState extends State<PostWidget> {
                           if (widget.post != null) {
                             showDialog(
                               context: context,
-                              builder: (context) => PhotoModal(post: widget.post!),
+                              builder: (context) {
+                                BackEndService.incrementPostsOpened();
+                                return PhotoModal(post: widget.post!);
+                              },
                             );
                           }
                         },

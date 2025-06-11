@@ -30,6 +30,7 @@ class PhotoModalState extends State<PhotoModal> {
           ), 
           widget.post.chatID!
         );
+        BackEndService.incrementTotalComments();
         _controller.clear(); // Clear the text field after submission
       });
     }

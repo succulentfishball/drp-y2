@@ -118,6 +118,12 @@ class BackEndService {
   // Quantitative analysis
   static Future<void> incrementTotalPosts() async { await incrementQuantitativeField("totalPosts"); }
 
+  static Future<void> incrementTotalComments() async { await incrementQuantitativeField("totalComments"); }
+
+  static Future<void> incrementPostsOpened() async { await incrementQuantitativeField("postsOpened"); }
+
+  static Future<void> incrementTagsUsed() async { await incrementQuantitativeField("tagsUsed"); }
+
   static Future<void> incrementQuantitativeField(String field) async {
     final ref = dbRef.doc('Group_Data/$groupID/Quantitative_Data/${reverseDateFormat(DateTime.now())}');
     final snapshot = await ref.get();

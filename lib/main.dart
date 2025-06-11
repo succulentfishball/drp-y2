@@ -73,6 +73,9 @@ class _MyHomePageState extends State<MyHomePage> {
   // May break if exif can't read "creationTime" from file
   void uploadPhoto(XFile file, String caption, String? tag) async {
     BackEndService.incrementTotalPosts();
+    if (tag != null) { 
+      BackEndService.incrementTagsUsed();
+    }
 
     // Get meta data and file data
     final exif = await Exif.fromPath(file.path);
