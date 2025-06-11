@@ -46,7 +46,10 @@ class PostWidgetState extends State<PostWidget> {
     return Center(
       child: AspectRatio(
         aspectRatio: 3 / 4,
-        child: Container(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+          Container(
           padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
           decoration: BoxDecoration(
             image: _getFrameDecoration(),
@@ -167,6 +170,19 @@ class PostWidgetState extends State<PostWidget> {
             ]
           ),
         ),
+        Positioned(
+          top: -10,
+          left: 0,
+          right: 0,
+          child: Center(
+                    child: Icon(
+                      Icons.push_pin,
+                      color: Colors.red,
+                      size: 38,)
+                  ),
+        ),
+      ],
+      ),
       ),
     );
   }

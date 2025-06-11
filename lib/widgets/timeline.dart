@@ -59,17 +59,18 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
     var isMyPost = BackEndService.userID == widget.post.authorID;
 
     const maxRot = 4;
-    const maxShift = 20;
+    const maxShift = 30;
 
     final random = Random();
     double rotationAngle = (random.nextDouble() * 2 * maxRot - maxRot) * (pi / 180);
     // shift towards center only
-    double shiftX = (isMyPost ? -1 : 1) * random.nextDouble() * maxShift;
+    double shiftX = (isMyPost ? -0.5 : 1) * random.nextDouble() * maxShift;
 
     return Padding(
       padding: EdgeInsetsGeometry.all(4),
       child: Row(
-        mainAxisAlignment: isMyPost ? MainAxisAlignment.end : MainAxisAlignment.start,
+        // mainAxisAlignment: isMyPost ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: (isMyPost ? MainAxisAlignment.end : MainAxisAlignment.start),
         children: [
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.6,
@@ -160,6 +161,12 @@ class TimelineWidget extends StatefulWidget {
 
 class TimelineWidgetState extends State<TimelineWidget> {
   late ScrollController _scrollController;
+  String? _selectedTag;
+  List<String> get _allTags =>                             
+      widget.photos.map((n) => n.post.tag).where((t) => t != null).cast<String>().toSet().toList();
+  List<String?> get _pagesTags => [null, ..._allTags]; // null represents 'All'
+
+  
   Widget? kids;
 
   @override
@@ -197,35 +204,119 @@ class TimelineWidgetState extends State<TimelineWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      // background colour to fill up space if there is not enough post
-      child: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/chatbackground/paper.jpg'),
-            repeat: ImageRepeat.repeat,
+
+    final filteredPhotos = <TimelineNodeWidget>[];
+    final filteredKeys = <GlobalKey<TimelineNodeWidgetState>>[];
+    for (var i = 0; i < widget.photos.length; i++) {
+      final node = widget.photos[i];
+      if (_selectedTag == null || node.post.tag == _selectedTag) {
+        filteredPhotos.add(node);
+        filteredKeys.add(widget.photoKeys[i]);
+      }
+    }
+
+return Column(
+        children: [
+        // Filter tabs molded into page (Chrome-style)
+        // Tabs sit directly on the page background
+          Container(
+            color: Colors.white,
+            child: SizedBox(
+              height: 38, // just enough to contain the pills
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                child: Row(
+                  children: List.generate(_pagesTags.length, (i) {
+                    final tag = _pagesTags[i];
+                    final label = tag == null ? 'All' : tag;
+                    final isSelected = _selectedTag == tag;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: GestureDetector(
+                        onTap: () => setState(() => _selectedTag = tag),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Color(0xFFC1B39B) : Colors.grey.shade200,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                              bottomLeft: Radius.circular(0),
+                              bottomRight: Radius.circular(0),
+                            ),
+                            border: Border(
+                              top: BorderSide(
+                                color: isSelected ? Colors.brown.shade700 : Colors.grey.shade300,
+                                width: isSelected ? 2 : 1,
+                              ),
+                              left: BorderSide(
+                                color: isSelected ? Colors.brown.shade700 : Colors.grey.shade300,
+                                width: isSelected ? 2 : 1,
+                              ),
+                              right: BorderSide(
+                                color: isSelected ? Colors.brown.shade700 : Colors.grey.shade300,
+                                width: isSelected ? 2 : 1,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            label,
+                            style: TextStyle(
+                              color: isSelected ? Colors.brown.shade900 : Colors.grey.shade700,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
           ),
-        ),
-        child: ListView.builder(
-          // controller: _scrollController,
-          itemCount: widget.photos.length,
-          itemBuilder: (context, index) {
-            // background for each post
-            return Container(
-              decoration: BoxDecoration(
+          // Timeline posts list
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/chatbackground/paper.jpg'),
+                  image: AssetImage('assets/chatbackground/binder.png'),
                   repeat: ImageRepeat.repeat,
                 ),
               ),
-              child: TimelineNodeWidget(
-                key: widget.photoKeys[index],
-                post: widget.photos[index].post
-              )
-            );
-          },
+              child: ListView.separated(
+
+              controller: _scrollController,
+              itemCount: filteredPhotos.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, idx) {
+                final post = filteredPhotos[idx].post;
+                final isMyPost = BackEndService.userID == post.authorID;
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (!isMyPost) const SizedBox(width: 40), // extra offset from left
+                    // Book spine on posts
+                    Container(
+                      width: 8,
+                      color: Colors.brown.shade700,
+                    ),
+                    const SizedBox(width: 8),
+                    // Post content
+                    Expanded(
+                      child: TimelineNodeWidget(
+                        key: filteredKeys[idx],
+                        post: filteredPhotos[idx].post,
+                      ),
+                    ),
+                    // if (isMyPost) const SizedBox(width: 40), // extra offset from right
+                  ],
+                );
+              },
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
