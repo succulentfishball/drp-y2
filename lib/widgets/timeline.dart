@@ -29,17 +29,22 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
           String authorDisplayName = snapshot.data![0] ?? '';
           DateTime creationTime = post.timeFirstImageTaken!;
 
+          // Scroll to the bottom after the data is loaded
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            scrollToBottom();
+          });
+
           return PostWidget(
-              image: Image.memory(
-                snapshot.data![1],
-                fit: BoxFit.fitWidth,
-              ),
-              authorDisplayName: authorDisplayName,
-              creationDisplayTime: utils.dateAndTime(creationTime),
-              caption: widget.post.caption ?? '',
-              tag: widget.post.tag ?? '',
-              replyCount: 0,
-              post: widget.post,
+            image: Image.memory(
+              snapshot.data![1],
+              fit: BoxFit.fitWidth,
+            ),
+            authorDisplayName: authorDisplayName,
+            creationDisplayTime: utils.dateAndTime(creationTime),
+            caption: widget.post.caption ?? '',
+            tag: widget.post.tag ?? '',
+            replyCount: 0,
+            post: widget.post,
           );
         } else {
           if (snapshot.hasError) {
@@ -85,65 +90,6 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
         ]
       ),
     );
-
-    // IntrinsicHeight(
-    //   child: Row(
-    //     crossAxisAlignment: CrossAxisAlignment.stretch,
-    //       children: [
-    //         Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           children: [
-    //             // timeline vertical line
-    //             Expanded(
-    //               child: Container(
-    //                 height: 10,
-    //                 width: 6,
-    //                 color: Theme.of(context).colorScheme.surfaceTint,
-    //               ),
-    //             ),
-    //             // profile picture
-    //             Container(
-    //               width: 64,
-    //               height: 64,
-    //               decoration: BoxDecoration(
-    //                 shape: BoxShape.circle,
-    //                 color: Theme.of(context).colorScheme.surfaceContainer
-    //               ),
-    //               child: Icon(
-    //                 Icons.person,
-    //                 size: 32,
-    //                 color: Theme.of(context).colorScheme.onSurfaceVariant
-    //               ),
-    //             ),
-    //             // timeline vertical line
-    //             Expanded(
-    //               child: Container(
-    //                 width: 6,
-    //                 color: Theme.of(context).colorScheme.surfaceTint,
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //         // timeline horizontal line
-    //         Column(
-    //           children: [
-    //             Spacer(),
-    //             Container(
-    //               width: 32,
-    //               height: 4,
-    //               color: Theme.of(context).colorScheme.surfaceTint,
-    //               margin: EdgeInsets.symmetric(horizontal: 8),
-    //             ),
-    //             Spacer(),
-    //           ],
-    //         ),
-    //         // actual post container
-    //         Expanded(
-    //           child: buildPostWidget(widget.post),
-    //         ),
-    //       ]
-    //   ),
-    // );
   }
 
   @override
@@ -159,47 +105,27 @@ class TimelineWidget extends StatefulWidget {
   State<TimelineWidget> createState() => TimelineWidgetState();
 }
 
+ScrollController scrollController = ScrollController();
+void scrollToBottom() {
+    scrollController.animateTo(
+      scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
 class TimelineWidgetState extends State<TimelineWidget> {
-  late ScrollController _scrollController;
   String? _selectedTag;
   List<String> get _allTags =>                             
       widget.photos.map((n) => n.post.tag).where((t) => t != null).cast<String>().toSet().toList();
   List<String?> get _pagesTags => [null, ..._allTags]; // null represents 'All'
 
-  
-  Widget? kids;
-
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_scrollListener);
-  }
-
-  void _scrollListener() {
-    // Find the most top visible TimelineWidget
-    double mostTop = double.infinity;
-    TimelineNodeWidget? mostTopPhoto;
-
-    for (var photo in widget.photos) {
-      final RenderObject? renderObject = (photo.key is GlobalKey && (photo.key as GlobalKey).currentContext != null)
-          ? (photo.key as GlobalKey).currentContext!.findRenderObject()
-          : null;
-      if (renderObject is RenderBox) {
-        final position = renderObject.localToGlobal(Offset.zero);
-        if (position.dy < mostTop) {
-          mostTop = position.dy;
-          mostTopPhoto = photo;
-        }
-      }
-    }
-
-    if (mostTopPhoto != null) {
-      // Do something with the most top visible TimelineWidget
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Most top TimelineWidget: ${mostTopPhoto.caption}')),
-      // );
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    });
   }
 
   @override
@@ -215,105 +141,119 @@ class TimelineWidgetState extends State<TimelineWidget> {
       }
     }
 
-return Column(
-        children: [
-        // Filter tabs molded into page (Chrome-style)
-        // Tabs sit directly on the page background
-          Container(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            child: SizedBox(
-              height: 38, // just enough to contain the pills
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                child: Row(
-                  children: List.generate(_pagesTags.length, (i) {
-                    final tag = _pagesTags[i];
-                    final label = tag ?? 'All';
-                    final isSelected = _selectedTag == tag;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 4),
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedTag = tag),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected ? Color(0xFFC1B39B) : Theme.of(context).colorScheme.surfaceContainer,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(12),
-                              topRight: Radius.circular(12),
-                              bottomLeft: Radius.circular(0),
-                              bottomRight: Radius.circular(0),
-                            ),
-                            border: Border(
-                              top: BorderSide(
-                                color: Theme.of(context).colorScheme.outlineVariant,
-                                width: 1,
-                              ),
-                              left: BorderSide(
-                                color: Theme.of(context).colorScheme.outlineVariant,
-                                width: 1,
-                              ),
-                              right: BorderSide(
-                                color: Theme.of(context).colorScheme.outlineVariant,
-                                width: 1,
-                              ),
-                            ),
+    return Column(
+      children: [
+      // Filter tabs molded into page (Chrome-style)
+      // Tabs sit directly on the page background
+        Container(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          child: SizedBox(
+            height: 38, // just enough to contain the pills
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              child: Row(
+                children: List.generate(_pagesTags.length, (i) {
+                  final tag = _pagesTags[i];
+                  final label = tag ?? 'All';
+                  final isSelected = _selectedTag == tag;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedTag = tag),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Color(0xFFC1B39B) : Theme.of(context).colorScheme.surfaceContainer,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
+                            bottomLeft: Radius.circular(0),
+                            bottomRight: Radius.circular(0),
                           ),
-                          child: Text(
-                            label,
-                            style: TextStyle(
-                              color: isSelected ? Colors.brown.shade900 : Colors.grey.shade700,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          border: Border(
+                            top: BorderSide(
+                              color: Theme.of(context).colorScheme.outlineVariant,
+                              width: 1,
+                            ),
+                            left: BorderSide(
+                              color: Theme.of(context).colorScheme.outlineVariant,
+                              width: 1,
+                            ),
+                            right: BorderSide(
+                              color: Theme.of(context).colorScheme.outlineVariant,
+                              width: 1,
                             ),
                           ),
                         ),
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            color: isSelected ? Colors.brown.shade900 : Colors.grey.shade700,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
                       ),
-                    );
-                  }),
-                ),
+                    ),
+                  );
+                }),
               ),
             ),
           ),
-          // Timeline posts list
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/chatbackground/binder.png'),
-                  repeat: ImageRepeat.repeat,
+        ),
+        // Timeline posts list
+        Expanded(
+          child: Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/chatbackground/binder.png'),
+                    repeat: ImageRepeat.repeat,
+                  ),
+                ),
+                child: ListView.separated(
+                  controller: scrollController,
+                  itemCount: filteredPhotos.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, idx) {
+                    final post = filteredPhotos[idx].post;
+                    final isMyPost = BackEndService.userID == post.authorID;
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!isMyPost) const SizedBox(width: 40), // extra offset from left
+                        // Book spine on posts
+                        Container(
+                          width: 8,
+                          color: Colors.brown.shade700,
+                        ),
+                        const SizedBox(width: 8),
+                        // Post content
+                        Expanded(
+                          child: TimelineNodeWidget(
+                            key: filteredKeys[idx],
+                            post: filteredPhotos[idx].post,
+                          ),
+                        ),
+                        // if (isMyPost) const SizedBox(width: 40), // extra offset from right
+                      ],
+                    );
+                  },
                 ),
               ),
-              child: ListView.separated(
-
-              controller: _scrollController,
-              itemCount: filteredPhotos.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, idx) {
-                final post = filteredPhotos[idx].post;
-                final isMyPost = BackEndService.userID == post.authorID;
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (!isMyPost) const SizedBox(width: 40), // extra offset from left
-                    // Book spine on posts
-                    Container(
-                      width: 8,
-                      color: Colors.brown.shade700,
-                    ),
-                    const SizedBox(width: 8),
-                    // Post content
-                    Expanded(
-                      child: TimelineNodeWidget(
-                        key: filteredKeys[idx],
-                        post: filteredPhotos[idx].post,
-                      ),
-                    ),
-                    // if (isMyPost) const SizedBox(width: 40), // extra offset from right
-                  ],
-                );
-              },
-            ),
+              // Button to scroll to the bottom
+              Positioned(
+                bottom: 8,
+                left: 8,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    scrollToBottom();
+                  },
+                  child: const Icon(Icons.arrow_downward),
+                ),
+              ),
+            ],
           ),
         ),
       ],
