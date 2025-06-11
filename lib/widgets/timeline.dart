@@ -108,7 +108,7 @@ class TimelineWidget extends StatefulWidget {
 ScrollController scrollController = ScrollController();
 void scrollToBottom() {
     scrollController.animateTo(
-      scrollController.position.maxScrollExtent,
+      scrollController.position.minScrollExtent,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
@@ -213,10 +213,12 @@ class TimelineWidgetState extends State<TimelineWidget> {
                   ),
                 ),
                 child: ListView.separated(
+                  reverse: true,
                   controller: scrollController,
                   itemCount: filteredPhotos.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, idx) {
+                  itemBuilder: (context, id) {
+                    final idx = filteredPhotos.length - id - 1;
                     final post = filteredPhotos[idx].post;
                     final isMyPost = BackEndService.userID == post.authorID;
                     return Row(
