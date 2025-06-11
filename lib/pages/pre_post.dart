@@ -84,6 +84,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
   }
 
   @override
+  // Careful about using null checker on widget.post
   Widget build(BuildContext context) {
     final bool hasCustomFrame = _selectedTag == "Trying to Chef!" || _selectedTag == "Pets from home" || _selectedTag == "Postcards from home";
     return Scaffold(

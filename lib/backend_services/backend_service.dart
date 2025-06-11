@@ -60,9 +60,13 @@ class BackEndService {
     return dbRef.collection("Group_Data").doc(groupID!).collection("Posts").snapshots();
   } 
 
-  static Future<int> getNumberOfRepliesToPost(String chatID) async {
-    final chatMessages = await dbRef.collection("Group_Data").doc(groupID!).collection("Chat").doc(chatID).collection("Messages").get();
-    return chatMessages.docs.length - 1;
+  static Future<int> getNumberOfRepliesToPost(MyPost? post) async {
+    if (post != null) {
+      final chatMessages = await dbRef.collection("Group_Data").doc(groupID!).collection("Chat").doc(post.chatID!).collection("Messages").get();
+      return chatMessages.docs.length - 1;
+    } else {
+      return 0;
+    }
   }
 
   static Future<Uint8List?> fetchImageFromCloudByID(String imgID) async {

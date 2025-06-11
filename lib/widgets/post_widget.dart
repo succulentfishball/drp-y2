@@ -116,7 +116,7 @@ class PostWidgetState extends State<PostWidget> {
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           child: FutureBuilder(
-                            future: BackEndService.getNumberOfRepliesToPost(widget.post!.chatID!),
+                            future: BackEndService.getNumberOfRepliesToPost(widget.post),
                             builder: (context, snapshot) {
                               if (!snapshot.hasData) {
                                 return Text("... replies");
