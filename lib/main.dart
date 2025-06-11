@@ -288,7 +288,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       ),
       floatingActionButton: SpeedDial(
-        marginEnd: MediaQuery.sizeOf(context).width - 32,
+        marginEnd: 32 + 8,
         marginBottom: 8,
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
@@ -298,12 +298,14 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           SpeedDialChild(
             child: Icon(Icons.photo_library_outlined),
+            label: "Choose Photo",
             onTap: () {
               pickPhoto();
             },
           ),
           SpeedDialChild(
             child: Icon(Icons.camera_alt),
+            label: "Take Photo",
             onTap: () {
               takePhoto();
             },
