@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drp/data_types/comment.dart';
 import 'package:drp/data_types/my_image.dart';
-import 'package:drp/main.dart';
+import 'package:drp/data_types/my_post_record.dart';
 import 'package:drp/data_types/my_post.dart';
 import 'package:drp/utilities/global_vars.dart';
 import 'package:drp/utilities/toaster.dart' show Toaster;
@@ -129,13 +129,28 @@ class BackEndService {
     final snapshot = await ref.get();
     final value = snapshot.data()?[field];
     if (value != null) {
-      print("trying to update value: $value");
       ref.update({field: value + 1});
     } else {
       Map<String, dynamic> m = snapshot.data() ?? {};
       m.addEntries({field: 1}.entries);
-      print("About to set ${m.entries}");
       ref.set(m);
     }
   }
+
+  static Future<void> addToPostsHistory(MyPostRecord record) async { await addRecordToHistory(record, "postHistory"); }
+
+  static Future<void> addRecordToHistory(dynamic record, String field) async {
+    final ref = dbRef.doc('Group_Data/$groupID/Quantitative_Data/${reverseDateFormat(DateTime.now())}');
+    final snapshot = await ref.get();
+    final List<dynamic>? value = snapshot.data()?[field];
+    print(record.toString());
+    if (value != null) {
+      value.add(record.toFirestore());
+      ref.update({field: value});
+    } else {
+      Map<String, dynamic> m = snapshot.data() ?? {};
+      m[field] = [record.toFirestore()];
+      ref.set(m);
+    }
+  } 
 }
