@@ -41,7 +41,7 @@ class CommentModalState extends State<CommentModal> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 550,
+      height: 700,
       child: Padding(
         padding: EdgeInsetsGeometry.symmetric(vertical: 12),
         child: Column(
@@ -57,8 +57,7 @@ class CommentModalState extends State<CommentModal> {
               ),
             ),
             // scrollable comment section
-            SizedBox(
-              height: 470,
+            Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
                 child: StreamBuilder(
@@ -96,10 +95,9 @@ class CommentModalState extends State<CommentModal> {
                 )
               ),
             ),
-            Spacer(),
             // add comment input
             Padding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
+              padding: EdgeInsets.fromLTRB(8, 8, 8, MediaQuery.of(context).viewInsets.bottom),
               child: Row(
                 children: [
                   IconButton(

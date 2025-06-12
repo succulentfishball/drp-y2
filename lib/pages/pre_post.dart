@@ -106,7 +106,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                     SlideTransition(
                       position: _slideAnimation,
                       child: Container(
-                        height: 530,
+                        height: 300,
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.75),

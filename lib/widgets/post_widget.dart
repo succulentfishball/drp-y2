@@ -178,6 +178,7 @@ class PostWidgetState extends State<PostWidget> {
                                 onTap: () {
                                   if (widget.post != null) {
                                     showModalBottomSheet(
+                                      isScrollControlled: true,
                                       context: context,
                                       builder: (context) {
                                         BackEndService.incrementPostsOpened();
