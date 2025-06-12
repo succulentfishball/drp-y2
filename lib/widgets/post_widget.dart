@@ -170,7 +170,7 @@ class PostWidgetState extends State<PostWidget> {
                         child: GestureDetector(
                           onTap: () {
                             if (widget.post != null) {
-                              showDialog(
+                              showModalBottomSheet(
                                 context: context,
                                 builder: (context) {
                                   BackEndService.incrementPostsOpened();

@@ -40,57 +40,62 @@ class CommentModalState extends State<CommentModal> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      insetPadding: const EdgeInsets.all(8),
-      contentPadding: const EdgeInsets.all(8),
-      content: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // scrollable comment section
-            Expanded(
-              child: Scrollbar(
-                thumbVisibility: true,
-                child: StreamBuilder(
-                  stream: BackEndService.getAllCommentSnapshotsFromChat(widget.post.chatID!), 
-                  builder: (context, snapshot) {
-                    print("in builder");
-                    if (snapshot.hasData) {
-                      print("snapshot has data");
-                      comments.clear();
-                      for (final doc in snapshot.data!.docs) {
-                        print("doc $doc");
-                        comments.add(CommentWidget(comment: Comment.fromFirestore(doc, null)));
-                        print("comments length = ${comments.length}");
-                      }
-
-                      comments.sort((a, b) => (a.comment.postTime!.compareTo(b.comment.postTime!)));
-
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: comments.length,
-                        itemBuilder: (context, index) {
-                          return comments[index];
-                        }
-                      );
-
-                    } else {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: 1,
-                        itemBuilder: (_, _) {
-                          return Text("Loading comments...");
-                        }
-                      );
-                    }
-                  }
-                )
-              ),
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(vertical: 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // drag bar
+          Container(
+            width: 64,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.circular(8),
             ),
-            // add comment input
-            Row(
+          ),
+          // scrollable comment section
+          Scrollbar(
+            thumbVisibility: true,
+            child: StreamBuilder(
+              stream: BackEndService.getAllCommentSnapshotsFromChat(widget.post.chatID!), 
+              builder: (context, snapshot) {
+                print("in builder");
+                if (snapshot.hasData) {
+                  print("snapshot has data");
+                  comments.clear();
+                  for (final doc in snapshot.data!.docs) {
+                    print("doc $doc");
+                    comments.add(CommentWidget(comment: Comment.fromFirestore(doc, null)));
+                    print("comments length = ${comments.length}");
+                  }
+
+                  comments.sort((a, b) => (a.comment.postTime!.compareTo(b.comment.postTime!)));
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: comments.length,
+                    itemBuilder: (context, index) {
+                      return comments[index];
+                    }
+                  );
+                } else {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: 1,
+                    itemBuilder: (_, _) {
+                      return Text("Loading comments...");
+                    }
+                  );
+                }
+              }
+            )
+          ),
+          Spacer(),
+          // add comment input
+          Padding(
+            padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
+            child: Row(
               children: [
                 IconButton(
                   icon: Icon(Icons.emoji_emotions),
@@ -115,8 +120,8 @@ class CommentModalState extends State<CommentModal> {
                 ),
               ],
             ),
-          ]
-        ),
+          ),
+        ]
       ),
     );
   }
