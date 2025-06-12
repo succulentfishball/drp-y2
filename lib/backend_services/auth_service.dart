@@ -1,4 +1,4 @@
-import 'package:drp/toaster.dart' show Toaster;
+import 'package:drp/utilities/toaster.dart' show Toaster;
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {

@@ -1,6 +1,6 @@
-import 'package:drp/auth_service.dart';
-import 'package:drp/backend_service.dart';
-import 'package:drp/toaster.dart';
+import 'package:drp/backend_services/auth_service.dart';
+import 'package:drp/backend_services/backend_service.dart';
+import 'package:drp/utilities/toaster.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
