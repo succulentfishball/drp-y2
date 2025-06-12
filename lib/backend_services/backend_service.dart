@@ -129,6 +129,8 @@ class BackEndService {
   static Future<void> incrementTagsUsed() async { await incrementQuantitativeField("tagsUsed"); }
 
   static Future<void> incrementQuantitativeField(String field) async {
+    if (testMode) { return; }
+
     final ref = dbRef.doc('Group_Data/$groupID/Quantitative_Data/${reverseDateFormat(DateTime.now())}');
     final snapshot = await ref.get();
     final value = snapshot.data()?[field];
@@ -144,6 +146,8 @@ class BackEndService {
   static Future<void> addToPostsHistory(MyPostRecord record) async { await addRecordToHistory(record, "postHistory"); }
 
   static Future<void> addRecordToHistory(dynamic record, String field) async {
+    if (testMode) { return; }
+
     final ref = dbRef.doc('Group_Data/$groupID/Quantitative_Data/${reverseDateFormat(DateTime.now())}');
     final snapshot = await ref.get();
     final List<dynamic>? value = snapshot.data()?[field];
