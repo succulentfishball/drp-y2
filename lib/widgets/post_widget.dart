@@ -52,12 +52,12 @@ class PostWidgetState extends State<PostWidget> {
       padding: const EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
         color: tagColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         widget.tag,
         style: TextStyle(
-          letterSpacing: -1,
+          letterSpacing: -1.5,
           fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
           color: Colors.black87,
         ),
@@ -85,7 +85,7 @@ class PostWidgetState extends State<PostWidget> {
             clipBehavior: Clip.none,
             children: [
               Container(
-                padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   image: _getFrameDecoration(),
                   color: hasCustomFrame ? null : Colors.grey.shade100,
@@ -108,14 +108,15 @@ class PostWidgetState extends State<PostWidget> {
                       children: [
                         // Author pill
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 1),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.85),
-                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             widget.authorDisplayName,
                             style: TextStyle(
+                              letterSpacing: -0.5,
                               fontWeight: FontWeight.bold,
                               fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
                               color: Colors.black87,
@@ -155,6 +156,7 @@ class PostWidgetState extends State<PostWidget> {
                                 widget.creationDisplayTime,
                                 style: TextStyle(
                                   letterSpacing: -0.5,
+                                  height: 0,
                                   fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
                                   fontFamily: 'monospace',
                                   color: Colors.amber,
@@ -244,7 +246,7 @@ class PostWidgetState extends State<PostWidget> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withOpacity(0.8),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(

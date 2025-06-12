@@ -48,5 +48,5 @@ String time(DateTime dateTime) {
 }
 
 String dateAndTime(DateTime dateTime) {
-  return DateFormat('dd/MM/yy HH:mm').format(dateTime);
+  return DateFormat('HH:mm\ndd/MM/yy').format(dateTime);
 }
