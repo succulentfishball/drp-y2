@@ -29,11 +29,6 @@ class TimelineNodeWidgetState extends State<TimelineNodeWidget> with AutomaticKe
           String authorDisplayName = snapshot.data![0] ?? '';
           DateTime creationTime = post.timeFirstImageTaken!;
 
-          // Scroll to the bottom after the data is loaded
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToBottom();
-          });
-
           return PostWidget(
             image: Image.memory(
               snapshot.data![1],
