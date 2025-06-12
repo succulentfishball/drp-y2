@@ -16,17 +16,6 @@ class PrePostPage extends StatefulWidget {
 
 class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStateMixin {
   final TextEditingController _captionController = TextEditingController();
-  final List<String> _tags = [
-    "Reminds me of home",
-    "Trying to Chef!",
-    "Guess what?",
-    "What changed at home",
-    "Guess the price!",
-    "This made me think of you...",
-    "Postcards from home",
-    "Save for when we meet",
-    "Pets from home"
-  ];
   bool _showTags = false;
   String? _selectedTag;
 
@@ -118,7 +107,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                         ),
                         child: ListView(
                           padding: const EdgeInsets.all(12),
-                          children: _tags.map((tag) => RadioListTile<String>(
+                          children: postTags.keys.map((tag) => RadioListTile<String>(
                             title: Text(tag),
                             value: tag,
                             groupValue: _selectedTag,

@@ -20,22 +20,25 @@ class PostWidget extends StatefulWidget {
   PostWidgetState createState() => PostWidgetState();
 }
 
+Map<String, (String, Color)> postTags = {
+  "Reminds me of home": ("assets/photoframes/homeFrame.jpg", Colors.orangeAccent.shade100),
+  "Trying to Chef!": ("assets/photoframes/foodFrame.jpg", Colors.amber.shade300),
+  "Guess what?": ("assets/photoframes/guessWhatFrame.jpg", Colors.lightBlue),
+  "What changed at home": ("assets/photoframes/whatsChangedFrame.jpg", Colors.blueAccent.shade100),
+  "Guess the price!": ("assets/photoframes/guessPriceFrame.jpg", Colors.green),
+  "This made me think of you...": ("assets/photoframes/thinkOfYouFrame.jpg", Colors.yellow.shade100),
+  "Postcards from home": ("assets/photoframes/postcardFrame.jpg", Colors.deepPurple.shade200),
+  "Save for when we meet": ("assets/photoframes/saveFrame.jpg", Colors.deepPurple.shade400),
+  "Pets from home": ("assets/photoframes/petFrame.jpg", Colors.redAccent.shade100),
+};
+
 class PostWidgetState extends State<PostWidget> {
   DecorationImage? _getFrameDecoration() {
-    if (widget.tag == "Trying to Chef!") {
-      return const DecorationImage(
-        image: AssetImage("assets/photoframes/foodframe.png"),
-        fit: BoxFit.fill,
-      );
-    } else if (widget.tag == "Pets from home") {
-      return const DecorationImage(
-        image: AssetImage("assets/photoframes/petframe.png"),
-        fit: BoxFit.fill,
-      );
-    }
-    else if (widget.tag == "Postcards from home") {
-      return const DecorationImage(
-        image: AssetImage("assets/photoframes/postcardframe.png"),
+    final tagData = postTags[widget.tag];
+    if (tagData != null) {
+      final (path, color) = tagData;
+      return DecorationImage(
+        image: AssetImage(path),
         fit: BoxFit.fill,
       );
     }
@@ -43,16 +46,7 @@ class PostWidgetState extends State<PostWidget> {
   }
 
   Widget _getTagPill() {
-    Color tagColor;
-    if (widget.tag == "Trying to Chef!") {
-      tagColor = Colors.amber.shade300;
-    } else if (widget.tag == "Pets from home") {
-      tagColor = Colors.redAccent.shade100;
-    } else if (widget.tag == "Postcards from home") {
-      tagColor = Colors.deepPurple.shade200;
-    } else {
-      tagColor = Colors.white.withOpacity(0.8);
-    }
+    final tagColor = postTags[widget.tag]?.$2 ?? Colors.white.withOpacity(0.8);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -73,7 +67,7 @@ class PostWidgetState extends State<PostWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasCustomFrame = widget.tag == "Trying to Chef!" || widget.tag == "Pets from home" || widget.tag == "Postcards from home";
+    final bool hasCustomFrame = postTags.keys.contains(widget.tag);
     return Center(
       child: AspectRatio(
         aspectRatio: 3 / 4,

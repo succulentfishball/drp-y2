@@ -75,9 +75,15 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
   assets:
-    - assets/photoframes/foodframe.png
-    - assets/photoframes/petframe.png
-    - assets/photoframes/postcardframe.png
+    - assets/photoframes/foodFrame.jpg
+    - assets/photoframes/petFrame.jpg
+    - assets/photoframes/postcardFrame.jpg
+    - assets/photoframes/saveFrame.jpg
+    - assets/photoframes/homeFrame.jpg
+    - assets/photoframes/thinkOfYouFrame.jpg
+    - assets/photoframes/guessPriceFrame.jpg
+    - assets/photoframes/whatsChangedFrame.jpg
+    - assets/photoframes/guessWhatFrame.jpg
     - assets/chatbackground/paper.jpg
     - assets/chatbackground/binder.png
     - assets/icons/push-pin.png
