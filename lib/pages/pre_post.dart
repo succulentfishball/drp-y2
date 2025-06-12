@@ -62,6 +62,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
   @override
   // Careful about using null checker on widget.post
   Widget build(BuildContext context) {
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -223,6 +224,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: TextField(
+                            enabled: !_showTags,
                             controller: _captionController,
                             style: const TextStyle(fontSize: 16),
                             decoration: const InputDecoration(
