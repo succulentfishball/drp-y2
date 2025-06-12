@@ -18,7 +18,6 @@ import 'package:native_exif/native_exif.dart';
 import 'package:uuid/uuid.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:drp/data_types/my_user.dart';
 import 'package:drp/data_types/my_post.dart';
 import 'package:drp/data_types/my_image.dart';
@@ -307,32 +306,31 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         }
       ),
-      floatingActionButton: SpeedDial(
-        marginEnd: 32 + 8,
-        marginBottom: 8,
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        icon: Icons.add,
-        activeIcon: Icons.remove,
-        overlayOpacity: 0.0,
+      floatingActionButton: Stack(
         children: [
-          SpeedDialChild(
-            child: Icon(Icons.photo_library_outlined),
-            label: "Choose Photo",
-            onTap: () {
-              pickPhoto();
-            },
+          Positioned(
+            bottom: 64,
+            right: 0,
+            child: FloatingActionButton(
+              onPressed: () {
+                pickPhoto();
+              },
+              child: Icon(Icons.photo_library_outlined),
+            ),
           ),
-          SpeedDialChild(
-            child: Icon(Icons.camera_alt),
-            label: "Take Photo",
-            onTap: () {
-              takePhoto();
-            },
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: FloatingActionButton(
+              onPressed: () {
+                takePhoto();
+              },
+              child: Icon(Icons.camera_alt),
+            ),
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat
     );
   }
 }

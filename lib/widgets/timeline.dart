@@ -251,8 +251,8 @@ class TimelineWidgetState extends State<TimelineWidget> {
               ),
               // Button to scroll to the bottom
               Positioned(
-                bottom: 8,
-                left: 8,
+                bottom: 16,
+                left: 16,
                 child: FloatingActionButton(
                   onPressed: () {
                     scrollToBottom();
