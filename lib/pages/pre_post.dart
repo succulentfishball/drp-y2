@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:drp/widgets/post_widget.dart';
 import 'package:drp/utilities/utils.dart' as utils;
+import 'package:drp/backend_services/backend_service.dart';
+
 
 class PrePostPage extends StatefulWidget {
   final XFile imageFile;
@@ -51,6 +53,10 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
 
   void clearTag() {
     setState(() => _selectedTag = null);
+  }
+
+  Color getTagColor(String tag) {
+    return postTags[tag]!.$2;
   }
 
   @override
@@ -121,42 +127,91 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                         ),
                       ),
                     ),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: toggleTagDropdown,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.orangeAccent.shade100,
-                            borderRadius: BorderRadius.circular(20),
+                  // Tags side scroll
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: BouncingScrollPhysics(),
+                    clipBehavior: Clip.none,
+                    child: 
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: toggleTagDropdown,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.orangeAccent.shade100,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.label_outline, size: 20),
+                                  const SizedBox(width: 6),
+                                  const Text("Tag", style: TextStyle(fontSize: 16)),
+                                  if (_selectedTag != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        _selectedTag!,
+                                        style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.label_outline, size: 20),
-                              const SizedBox(width: 6),
-                              const Text("Tag", style: TextStyle(fontSize: 16)),
-                              if (_selectedTag != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(
-                                    _selectedTag!,
-                                    style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
+                          if (_selectedTag != null)
+                            IconButton(
+                              icon: const Icon(Icons.clear, color: Colors.white),
+                              onPressed: clearTag,
+                            ),
+                          const SizedBox(width: 12),
+                          
+                          if (_selectedTag == null) 
+                            FutureBuilder<List<String>>(
+                              future: BackEndService.getRecentTags(),
+                              builder: (context, snap) {
+                                if (!snap.hasData || snap.data!.isEmpty)
+                                  return const SizedBox();
+                                final recent = snap.data!;
+                                // map each of the 2 tags to a pill
+                                return Row(
+                                  children: recent.map((tag) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 8),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedTag = tag;
+                                            _showTags = false;
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: getTagColor(tag),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            tag,
+                                            style: const TextStyle(
+                                                color: Colors.white, fontSize: 14),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                );
+                              },
+                            ),
+                        ],
                       ),
-                      if (_selectedTag != null)
-                        IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.white),
-                          onPressed: clearTag,
-                        ),
-                    ],
                   ),
+
                   const SizedBox(height: 8),
+                  
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [

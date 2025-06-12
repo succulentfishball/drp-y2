@@ -119,6 +119,33 @@ class BackEndService {
     userID = null; groupID = null;
   }
 
+  static Future<List<String>> getRecentTags() async {
+    final userId = userID; // assume this is your static current‐user ID
+    // 1) Fetch the latest 50 posts by timestamp only:
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Group_Data')
+        .doc(groupID)
+        .collection("Posts")
+        .orderBy('postTime', descending: true)  // single‐field index only
+        .limit(50)
+        .get();
+
+    // 2) Walk through in order, picking out up to 2 distinct tags for this user
+    final seen = <String>{};
+    final recent = <String>[];
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      if (data['authorID'] == userId) {
+        final tag = (data['tag'] as String?)?.trim();
+        if (tag != null && tag.isNotEmpty && seen.add(tag)) {
+          recent.add(tag);
+          if (recent.length == 2) break;
+        }
+      }
+    }
+    return recent;
+  }
+
   // Quantitative analysis
   static Future<void> incrementTotalPosts() async { await incrementQuantitativeField("totalPosts"); }
 
