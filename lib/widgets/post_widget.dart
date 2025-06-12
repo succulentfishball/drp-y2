@@ -22,13 +22,13 @@ class PostWidget extends StatefulWidget {
 
 Map<String, (String, Color)> postTags = {
   "Reminds me of home": ("assets/photoframes/homeFrame.jpg", Colors.orangeAccent.shade100),
-  "Trying to Chef!": ("assets/photoframes/foodFrame.jpg", Colors.amber.shade300),
+  "Trying to Chef!": ("assets/photoframes/foodFrame.jpg", Colors.orange),
   "Guess what?": ("assets/photoframes/guessWhatFrame.jpg", Colors.lightBlue),
   "What changed at home": ("assets/photoframes/whatsChangedFrame.jpg", Colors.blueAccent.shade100),
   "Guess the price!": ("assets/photoframes/guessPriceFrame.jpg", Colors.green),
   "This made me think of you...": ("assets/photoframes/thinkOfYouFrame.jpg", Colors.yellow.shade100),
   "Postcards from home": ("assets/photoframes/postcardFrame.jpg", Colors.deepPurple.shade200),
-  "Save for when we meet": ("assets/photoframes/saveFrame.jpg", Colors.deepPurple.shade400),
+  "Save for when we meet": ("assets/photoframes/saveFrame.jpg", Colors.red.shade400),
   "Pets from home": ("assets/photoframes/petFrame.jpg", Colors.redAccent.shade100),
 };
 
