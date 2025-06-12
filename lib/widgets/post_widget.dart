@@ -2,6 +2,7 @@ import 'package:drp/backend_services/backend_service.dart';
 import 'package:drp/data_types/my_post.dart';
 import 'package:flutter/material.dart';
 import 'package:drp/widgets/photo_modal.dart';
+import 'package:drp/widgets/comment_modal.dart';
 
 class PostWidget extends StatefulWidget {
   const PostWidget({super.key, required this.image, required this.authorDisplayName, required this.creationDisplayTime, required this.caption, required this.tag, required this.replyCount, this.post});
@@ -141,6 +142,7 @@ class PostWidgetState extends State<PostWidget> {
                         },
                         child: widget.image
                       ),
+                      // date time watermark
                       Positioned(
                         bottom: 4,
                         left: 4,
@@ -161,46 +163,60 @@ class PostWidgetState extends State<PostWidget> {
                           ),
                         ),
                       ),
+                      // comment bubble with click detector
                       Positioned(
                         bottom: 4,
                         right: 4,
-                        child: Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(180),
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                          child: widget.post != null ? StreamBuilder(
-                            stream: BackEndService.getAllCommentSnapshotsFromChat(widget.post!.chatID), 
-                            builder: (_, _) => FutureBuilder(
-                              future: BackEndService.getNumberOfRepliesToPost(widget.post),
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData) {
-                                  return Text("... replies");
-                                } else {
-                                  final x = snapshot.data!;
-                                  return Row(
-                                    children: [
-                                      Text("$x",
-                                        style: TextStyle(
-                                          fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (widget.post != null) {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  BackEndService.incrementPostsOpened();
+                                  return CommentModal(post: widget.post!);
+                                },
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(180),
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            child: widget.post != null ? StreamBuilder(
+                              stream: BackEndService.getAllCommentSnapshotsFromChat(widget.post!.chatID), 
+                              builder: (_, _) => FutureBuilder(
+                                future: BackEndService.getNumberOfRepliesToPost(widget.post),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return Text("... replies");
+                                  } else {
+                                    final x = snapshot.data!;
+                                    return Row(
+                                      children: [
+                                        Text("$x",
+                                          style: TextStyle(
+                                            fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
+                                            fontWeight: FontWeight.bold,
+                                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 4),
-                                      Icon(
-                                        Icons.comment,
-                                        color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                        size: 20,
-                                      ),
-                                    ]
-                                  );
-                                }
-                              },
-                            ) 
-                          ) : Text("0 replies")
-                        )
+                                        SizedBox(width: 4),
+                                        Icon(
+                                          Icons.comment,
+                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                          size: 20,
+                                        ),
+                                      ]
+                                    );
+                                  }
+                                },
+                              ) 
+                            ) : Text("0 replies")
+                          )
+                        ),
                       ),
                     ]
                   ),
