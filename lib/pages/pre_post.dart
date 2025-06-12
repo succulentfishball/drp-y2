@@ -69,23 +69,24 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
               ),
             ),
           ),
-          PostWidget(
-            image: FractionallySizedBox(
-              widthFactor: 0.9,
-              heightFactor: 0.9,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.file(
-                  File(widget.imageFile.path),
-                  fit: BoxFit.cover,
+          Transform.scale(
+            scale: 1 / 0.6,
+            child: Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: PostWidget(
+                  image: Image.file(
+                    File(widget.imageFile.path),
+                    fit: BoxFit.cover,
+                  ),
+                  authorDisplayName: 'me',
+                  creationDisplayTime: utils.dateAndTime(DateTime.now()),
+                  caption: _captionController.text,
+                  tag: _selectedTag ?? '',
+                  replyCount: 0,
                 ),
               ),
             ),
-            authorDisplayName: 'me',
-            creationDisplayTime: utils.dateAndTime(DateTime.now()),
-            caption: _captionController.text,
-            tag: _selectedTag ?? '',
-            replyCount: 0,
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -99,7 +100,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                     SlideTransition(
                       position: _slideAnimation,
                       child: Container(
-                        height: 300,
+                        height: 530,
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.75),
@@ -175,6 +176,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                             ),
                             minLines: 1,
                             maxLines: 3,
+                            onChanged: (_) => setState(() {}),
                           ),
                         ),
                       ),

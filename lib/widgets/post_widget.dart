@@ -219,7 +219,17 @@ class PostWidgetState extends State<PostWidget> {
                                         }
                                       },
                                     ) 
-                                  ) : Text("0 replies")
+                                  ) : Row(
+                                    children: [
+                                      Text("0"),
+                                      SizedBox(width: 4),
+                                      Icon(
+                                        Icons.comment,
+                                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                        size: 16,
+                                      ),
+                                    ]
+                                  ),
                                 )
                               ),
                             ),
