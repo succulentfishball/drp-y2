@@ -199,10 +199,10 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.lightBlueAccent,
+                            color: Theme.of(context).colorScheme.primaryContainer,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.send, color: Colors.white),
+                          child: Icon(Icons.send, color: Theme.of(context).colorScheme.onPrimaryContainer),
                         ),
                       )
                     ],

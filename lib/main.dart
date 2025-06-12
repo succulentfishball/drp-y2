@@ -23,6 +23,7 @@ import 'package:drp/data_types/my_user.dart';
 import 'package:drp/data_types/my_post.dart';
 import 'package:drp/data_types/my_image.dart';
 import 'package:drp/pages/pre_post.dart';
+import 'package:flutter/services.dart';
 
 MyUser? userData;
 
@@ -37,6 +38,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return MaterialApp(
       title: 'DRP',
       theme: ThemeData(
