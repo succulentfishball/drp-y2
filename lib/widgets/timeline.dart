@@ -149,6 +149,7 @@ class TimelineWidgetState extends State<TimelineWidget> {
           color: Theme.of(context).colorScheme.primaryContainer,
           child: SizedBox(
             height: 38, // just enough to contain the pills
+            width: MediaQuery.of(context).size.width,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
