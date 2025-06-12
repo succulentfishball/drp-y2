@@ -161,7 +161,11 @@ class TimelineWidgetState extends State<TimelineWidget> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 4),
                     child: GestureDetector(
-                      onTap: () => setState(() => _selectedTag = tag),
+                      onTap: () => {
+                        if (!isSelected) {
+                          setState(() => _selectedTag = tag)
+                        }
+                      },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
