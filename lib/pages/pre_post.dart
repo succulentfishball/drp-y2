@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:drp/widgets/post_widget.dart';
+import 'package:drp/utilities/utils.dart' as utils;
 
 class PrePostPage extends StatefulWidget {
   final XFile imageFile;
@@ -92,7 +93,7 @@ class _PrePostPageState extends State<PrePostPage> with SingleTickerProviderStat
               ),
             ),
             authorDisplayName: 'me',
-            creationDisplayTime: 'now',
+            creationDisplayTime: utils.dateAndTime(DateTime.now()),
             caption: _captionController.text,
             tag: _selectedTag ?? '',
             replyCount: 0,

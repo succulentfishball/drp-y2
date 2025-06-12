@@ -183,7 +183,7 @@ class PostWidgetState extends State<PostWidget> {
                                     children: [
                                       Text("$x",
                                         style: TextStyle(
-                                          fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                                          fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
                                           fontWeight: FontWeight.bold,
                                           color: Theme.of(context).colorScheme.onSecondaryContainer,
                                         ),
@@ -192,7 +192,7 @@ class PostWidgetState extends State<PostWidget> {
                                       Icon(
                                         Icons.comment,
                                         color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                        size: 16,
+                                        size: 20,
                                       ),
                                     ]
                                   );
