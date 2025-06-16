@@ -30,6 +30,8 @@ Map<String, (String, Color)> postTags = {
   "Postcards from home": ("assets/photoframes/postcardFrame.jpg", Colors.deepPurple.shade200),
   "Save for when we meet": ("assets/photoframes/saveFrame.jpg", Colors.red.shade400),
   "Pets from home": ("assets/photoframes/petFrame.jpg", Colors.redAccent.shade100),
+  "Exploring the World": ("assets/photoframes/travel.png", Colors.lightBlueAccent.shade100),
+  "Study Updates": ("assets/photoframes/school.png", Colors.green.shade900),
 };
 
 class PostWidgetState extends State<PostWidget> {

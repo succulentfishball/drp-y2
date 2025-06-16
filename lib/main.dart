@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'DRP',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 248, 200, 137)),
       ),
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
@@ -197,7 +197,7 @@ class _MyHomePageState extends State<MyHomePage> {
     global_vars.startingPostTime = DateTime.now();
     global_vars.currentPostingMethod = Method.gallery;
 
-    final XFile? photo = await picker.pickImage(source: ImageSource.gallery, imageQuality: 5);
+    final XFile? photo = await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
     if (photo != null) {
       Navigator.push(
         context,
